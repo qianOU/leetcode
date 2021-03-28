@@ -2362,3 +2362,192 @@ for i in [1,2,3,4,5,6]:
 
 print('4分组反转链表：')
 print_link(reverseKGroup(head, 4))
+
+
+# In[ 回溯算法解决子集，组合，排列问题]
+import copy
+#
+
+# 子集问题 (不考虑顺序的差异)
+# 第一种思路： 归纳思想
+# 时间复杂度为：O(N*2**N)
+def subset(nums):
+    #base-case
+    if len(nums)==0:
+        return [[]]
+    
+    one = subset(nums[:-1]) # 获得不含有 end 的子集部分
+    end = nums[-1]
+
+
+
+    # 后序遍历操作
+    for i in range(len(one)): # 子集数目 为 2**N，所以时间复杂度为 O(N2**N)
+        one.append(one[i].copy()) # 由于复制数组，时间复杂度为 O(N)
+        one[i].append(end) # 将最后一个元素，添加入 nums[:-1]构成的子集之中，于是就得到了 nums中含有 end 的子集部分
+    
+    return one
+
+print(subset([1,2,3]))
+
+    
+# 解法2： 基于回溯算法
+# 时间复杂度：为遍历所有可能的情况即 O(2**N)
+def subset2(nums):
+    res = [] # 存放子集的列表
+
+    def subsetBT(start, track):
+        """
+        start 是控制选择列表参数，用于确保 子集不重复
+        track 是记录路径的列表
+        """
+        # 由于是寻找子集，所以没有结束条件
+        # 前序遍历位置
+        res.append(track.copy())
+
+        for i in range(start, len(nums)): # 选择列表
+            # 做·选择
+            track.append(nums[i])
+            # 递归回溯
+            subsetBT(i+1, track)
+            # 回退
+            track.pop()
+        
+    subsetBT(0, [])
+    return res
+
+print(subset2([1,2,3]))
+
+# 组合问题 （不考虑顺序）
+# 回溯解法
+def combination(n, k):
+    """
+    计算 1-n 中， 每两个进行组合的所有情况
+    """
+    res = []
+    
+    def backtrace(start, track):
+        """
+        start: 由于组合不要求顺序，因此使用start控制选择列表
+        track: 记录走过的路径
+        """
+        # 结束条件
+        if len(track) == k: # 如果记录数据已经有 k个 则结束
+            res.append(track.copy())
+
+        for i in range(start, n+1):
+            # 做选择
+            track.append(i)
+            # 递归回溯
+            backtrace(i+1, track)
+            # 回退
+            track.pop()
+        
+    backtrace(1, [])
+    return res
+
+print(combination(3, 2))
+
+# 排列问题 （需要考虑顺序）
+def permute(n):
+    """
+    返回 1-n 的所有排列情况
+    """
+    res = []
+
+    def bt(track):
+        # 结束条件
+        if len(track) == n:
+            res.append(track.copy())
+
+        for i in range(1, n+1):
+            if i in track: # 排列要求不能有重复元素
+                continue
+            # 做选择
+            track.append(i)
+            # 递归回溯
+            bt(track)
+            # 回退
+            track.pop()
+    
+    bt([])
+    return res
+
+print(permute(3))
+
+"""
+总结：对于子集和组合这种无序的情况，使用start进行递归剪枝
+    对于排列这种需要考虑顺序的情况，使用 contains 查看记录是否包含当前选择进行剪枝
+"""
+# In[回溯算法最佳实践，解数组]
+
+def solveSudoku(board):
+    """
+    board 是棋盘，其中 . 表示代填充的空格
+    数组的游戏规则是：
+        1. 每一行，每一列都不能有重复数字
+        2. 每一个3*3的子棋盘都是没有重复数字的，9*9大棋盘固定了9个3*3的小棋盘
+    """
+    def isValid(i,j,c):
+        """
+        判断在board[i][j]填写 c 是否可行
+        """
+        for f in range(9):
+            # 判断一行中是否有重复字符
+            if board[i][f] == c:
+                return False
+            # 判断列
+            if board[f][j] == c:
+                return False
+
+            # 判断 3*3 是否有重复字符
+            if board[i//3*3 + f//3][j//3*3 + f%3] == c:
+                return False
+        
+        return True
+
+    def bt(board, i, j):
+        # 确定结束条件
+        if i == 9:
+            # 找到一个可行解的时候，设立标识位为 true
+            return True
+        
+        # base-case
+        # 列索引超过边界，需要换行扫描
+        if j == 9:
+            return bt(board, i+1, 0)
+        
+        # 如果当前 位置 不需要 填充，则进行下一层的判断
+        if board[i][j] != '.':
+                return bt(board, i, j+1)
+
+        for val in range(1, 10):
+            # 做选择
+            if not isValid(i, j, str(val)):
+                continue
+
+            board[i][j] = str(val)
+            # 递归回溯
+            # 如果找到一个解法就立即返回
+            if bt(board, i, j+1): #按行填充
+                return board
+            # 回退
+            board[i][j] = '.'
+
+    return bt(board, 0, 0)
+
+board = \
+[
+["5","3",".",".","7",".",".",".","."],
+["6",".",".","1","9","5",".",".","."],
+[".","9","8",".",".",".",".","6","."],
+["8",".",".",".","6",".",".",".","3"],
+["4",".",".","8",".","3",".",".","1"],
+["7",".",".",".","2",".",".",".","6"],
+[".","6",".",".",".",".","2","8","."],
+[".",".",".","4","1","9",".",".","5"],
+[".",".",".",".","8",".",".","7","9"]
+]
+
+print(solveSudoku(board))
+            
