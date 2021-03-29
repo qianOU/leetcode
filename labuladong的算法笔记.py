@@ -2948,15 +2948,17 @@ def subarraySum(nums, k):
 
 print(subarraySum([1,1,1,2], 2))
 
-# 优化算法 1
+# 优化算法 
 # 暴力破解中的内层循环可以被优化
 # 原因是：内层循环实际上就是在找 能够使得 sum[j] == sum[i] - k 的 j 一共有几个
 # 优化方法是: 直接记录下有几个 sum[j] 和 sum[i] - k 相等，直接更新ans 就不用做循环判断了
+# 时间复杂度 为 O(N)
 def subarraySum2(nums, k):
     # 前缀和 -> 该前缀和出现的次数
     map_j = {0: 1} #构造 sum_j 的哈希映射表， 0：1是base-case, 表示单纯用sum_i == k的情况
 
     sum_i = 0
+    ans = 0
     for i in nums:
         sum_i += i
         sum_j = sum_i - k
@@ -2972,4 +2974,17 @@ def subarraySum2(nums, k):
 
 print(subarraySum2([1,1,1,2], 2))
 
+#In[]
+
+# 扁平化嵌套序列 
+def flatten(nums):
+    for i in nums:
+        if isinstance(i, list):
+            yield from i
+        else:
+            yield i
+
+nums = [[1,1],2,[1,1]]
+for i in flatten(nums):
+    print(i)
 # %%
