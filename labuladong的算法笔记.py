@@ -2551,3 +2551,425 @@ board = \
 
 print(solveSudoku(board))
             
+# In[回溯算法最佳实践（括号生成）]
+# 
+def generateParenthesis(n):
+    res = []
+
+    def bt(left, right, track):
+        """
+        left 指左括号的个数
+        right 指右括号的个数
+        track 是记录选择的路径
+        """
+        #base - case
+        if left == right == n:
+            res.append(''.join(track))
+            return
+        
+        # 如果左括号 少于 右括号， 说明是不合符的括号组合，退出回溯
+        if left < right:
+            return 
+        
+        # 如果 left 个数 多于 n个，或者 right 多于 n个，也是不符合的，需要退出循环
+        if left > n or right > n:
+            return 
+
+        for i in ['(', ')']:
+            #  做选择
+            track.append(i)
+            # 递归回溯
+            if i == "(":
+                bt(left+1, right, track)
+            else:
+                bt(left, right+1, track)
+            
+            # 回退
+            track.pop()
+    
+    bt(0,0,[])
+    return res
+
+print(generateParenthesis(3))
+
+
+# In[]
+# BFS算法暴力破解各种智力问题
+# 滑动迷宫
+def slidingPuzzle(board):
+    """
+    board是一个2*3的迷宫，只能将非0数字移动到0所代表的空格位置处，问最少几步可以构建出指定的序列
+    例如：  [[2, 1, 4],
+            [5, 0, 3]]
+    """
+    # tips: 在运用回溯算法时，不建议将整个二维数组做为状态记录，原因是十分浪费内存
+    #       推荐使用字符串来保存当前状态，但是对于每一个位置的上下左右的移动后的索引需要提前记录即可
+
+    # 在一维数据中，反映二维数组有的 上下左右移动概念
+    neighbor = {
+        0: [1, 3],
+        1: [0, 2, 4],
+        2: [1, 5],
+        3: [0, 4],
+        4: [1, 3, 5],
+        5: [2, 4]
+
+    }
+
+    import queue
+    q = queue.Queue() # 掌控前进步数的队列
+    # 集合记录已经走过的状态，防止回头路，出现死循环
+    visited = set()
+    start = ''.join([''.join(str(i) for j in board for i in j )])
+    target = '123450'
+    
+    q.put(start)
+    visited.add(start)
+
+    step = 0 #记录走的步数
+
+    while not q.empty():
+        sz = q.qsize()
+        
+        for i in range(sz):
+            one = q.get()
+
+            if one == target:
+                return 
+            
+            idx = one.index('0')
+            for j in neighbor[idx]: #获取选择列表
+                temp = list(one)
+                temp[idx], temp[j] = temp[j], temp[idx]
+                if ''.join(temp) not in visited:
+                    q.put(''.join(temp))
+                    visited.add(''.join(temp))
+        
+        step += 1
+    return step
+
+
+board =  [[2, 1, 4],
+            [5, 0, 3]]
+
+print(slidingPuzzle(board))
+
+# In[]
+# 2Sum 问题的核心思想
+# 使用哈希列表的方法 时间复杂度 为 O(N)
+def twoSum(nums, target):
+    map_ = {}
+    for i in range(len(nums)):
+        if target - nums[i] in map_:
+            return [map_[target-nums[i]], i]
+        map_[nums[i]] = i
+    return 
+
+print(twoSum([3,1,3,6], 6))
+
+# 如果 nums 是有序的可以使用双指针法
+# 左右指针
+def twoSum2(nums, target):
+    left = 0
+    right = len(nums) - 1 #搜索区间为 左闭右闭
+    while left < right: # 因为必须是使用nums数组中，不同的两个数 所以 left == right是不符合的条件
+        if(left+right < target): left += 1
+        if(left+right > target): right -= 1
+        else: return [left, right]
+    return
+
+print(twoSum([1,2,3,3,6], 6))
+
+# In[]
+# 一个函数解决 nSum问题
+
+# 其一：求解数组中两个数和为 target的所有元素对，不能重复
+# 使用双指针技巧-----左右指针
+def twoSumTarget(nums, target,start=0):
+    """
+    要使用左右指针技巧，需要事先对 nums进行排序,时间复杂度为 O(Nlog(N))
+    start 是左指针的起始位置，默认为0，即nums的最左端开始扫描
+    """
+
+    left = start
+    right = len(nums) - 1
+    res = [] # 保存所有可能的组合的list
+    while left < right:
+        sum_ = nums[left] + nums[right]
+        lo = nums[left] #记录当前指针指示的值
+        ho = nums[right] # 记录当前指针指示的值
+        if sum_ < target:
+            # 不仅仅是移动一位左指针， 将所有的左指针遇见的与当前 lo 重复项都跳过
+            while left < right and nums[left] == lo: left+=1 
+        elif sum_ > target:
+            # 右指针移动到不重复的那一项
+            while left < right and nums[right] == ho: right-=1
+        else:
+            res.append([nums[left], nums[right]])
+            # 跳过所有重复的元素
+            while left < right and nums[left] == lo: left+=1 
+            while left < right and nums[right] == ho: right-=1
+    return res
+
+# 第一步排序
+nums = sorted([1,3,1,2,2,3])
+print(twoSumTarget(nums, 4))
+
+
+# 3Sum问题
+# 3Sum 问题实际上可以归纳为 1 + 2Sum问题
+# 时间复杂度为 O(N**2) 主要排序用来 O(Nlog(N)), twoSumTarget中使用了O(N), threeSumTarget中使用了for时间复杂度为O(N)
+def threeSumTarget(nums, target, start=0):
+    """
+    nums： 需要事先排序，再作为参数传人
+    target： 目标值
+    start: 寻找解的左指针位置，默认为0
+    """
+    nums = sorted(nums) # 对nums进行排序，这样之后就可以使用双指针技巧，拆解问题
+    res = []
+    i= start
+
+    while i < len(nums):
+        temp = nums[i] # 记录 nums[i]的值，用于 指针去重移动
+        target_2 = target - nums[i]
+        # 在2Sum子问题上，规定left从 i+1开始，这样可以有效避免 2Sum子集 重复问题
+        ans = twoSumTarget(nums, target_2, start=i+1)
+        for one in ans:
+            one.append(nums[i])
+            res.append(one)
+        # 跳过第一个数字重复的情况，否则答案中会有重复的情况 例如 nums=[1,1,1,1, 2, 3]， target=6
+        while i<len(nums) and nums[i] == temp: i+=1
+    return res
+
+nums = sorted([-1, 0, 1,2, -1, -4])
+
+print(threeSumTarget(nums, 0))
+
+# 4SUm问题
+# 同理实质上可以分解为 1 + 3SUm子问题
+# 时间复杂度 为 O(N**3)
+def fourSumTarget(nums, target):
+    
+    nums = sorted(nums)
+    i = 0
+    res = []
+
+    while i < len(nums):
+        temp = nums[i]
+        ans = threeSumTarget(nums, target-temp, i+1)
+        for one in ans:
+            one.append(temp)
+            res.append(one)
+        
+        # 对第一个数字进行去重，指针移动到下一个不重复的数字上
+        while i < len(nums) and nums[i] == temp: i+=1
+    return res
+
+print(fourSumTarget([-1, 0,-1, 1,2,0,-2], 0))
+
+# 100Sum问题
+# 套用 递归 + 双指针技巧
+def nSumTarget(nums,  n, start, target):
+    """
+    由上面展示的逻辑，我们可以抽象出一套求解 NSum 的递归处理框架
+    注意: 必须在使用前对nums进行排序处理，如果在递归函数中使用排序，则太浪费计算资源
+    n：表示的是求解的 nSum问题
+    start： 设置的是左指针搜索的起点，主要是为了避免重复的问题
+    target: 是目标值 
+    """
+    res = []
+
+    # 去掉不合理的情况
+    if n < 2 or len(nums) < n: #必须是大于 2Sum, 并且数组元素要大过 n
+        return res
+    
+    # base-case
+    if n == 2:
+        left, right = start,  len(nums) - 1
+        while left < right:
+            lo, ho = nums[left], nums[right] # 记录指针指向的值，用于后面指针移动到非重复值的位置
+            sum_ = lo + ho
+            if sum_ < target:
+                # 移动指针到 非重复的位置
+                while left < right and nums[left] == lo: left+=1
+            elif sum_ > target: 
+                # 移动指针到 非重复的位置
+                while left < right and nums[right] == ho: right -=1
+            else:
+                res.append([lo, ho])
+                # 移动指针到 非重复的位置
+                while left < right and nums[left] == lo: left+=1
+                while left < right and nums[right] == ho: right-=1
+        # return res
+    else: # n>2时， 递归计算 （n-1)Sum的结果
+        idx = start
+        while idx < len(nums):
+            temp = nums[idx]
+            # 注意 不能再用 res作为变量名，不然下面的for循环会卡死在自循环里面
+            ans = nSumTarget(nums, n-1, idx+1, target-nums[idx])
+            for i in ans:
+                i.append(nums[idx])
+                res.append(i)
+            # 去重
+            while idx<len(nums) and nums[idx]==temp: idx+=1
+
+    return res
+
+nums = sorted([-1,-1, 0, 1,2,0,-2])
+
+print(nSumTarget(nums,5, 0, 0))
+
+# In[]
+# 拆解复杂问题：实现计算器
+
+def calculator(string): 
+
+    def helper(s:list):
+        """在递归中，如果想改变每层的状态，推荐使用引用类型作为参数"""
+        # 计算栈
+        stack = []
+        sign = "+" #设定表达式最左侧有 + 符号
+
+        num = 0
+        while len(s):
+            ch = s.pop(0) # 取出第一个字符
+            # 计算 数字大小
+            if ch.isdigit():
+                num = num * 10 + int(ch)
+
+            if ch == '(': #有括号时，就相当于是子问题，可以用递归处理
+                num = helper(s) # 此处 s 已经是弹出了 左括号的列表
+
+
+
+            # 如果 ch是 运算符 或者 括号，或者是扫描到最后一个元素时，要进行判断上一单元是否入栈
+            if (ch != ' ' and not ch.isdigit()) or len(s)==0:
+                # 如果是乘法或者除法，先和栈顶元素结合，再入栈（乘法运算的优先级决定的）
+                if sign == "*":
+                    stack[-1] *= num 
+                elif sign == "/":
+                    stack[-1] /= num
+                else: #面对 加法或者减法时，直接入栈
+                    stack.append(num if sign == '+' else -num) # 将数至压入栈
+                    print(num)
+                sign = ch # 记录下一个数字的运算符
+                # 将记录的数值清空为 0 
+                num = 0
+            
+
+            # 遇见右括号时，退出函数
+            if ch == ")":
+                break #此处 列表 s中的右括号也已经被弹出
+            
+        
+        return  sum(stack)
+    
+    return helper(list(string))
+
+print(calculator("3*((4-5/2))-6"))
+
+#In[ ]
+# 摊烧饼也得有递归的思想
+# 时间复杂度为 : 递归深度O(N)， 每次需要排序 O(N)，因此总的时间复杂度为 O(N**2)
+def pancakeSort(cakes):
+    
+    # 自由变量： 在递归时，是作为公用变量
+    res = [] #记录运作手续
+
+
+
+    def reverse(cake, start, end):
+        """
+        将cake中 索引范围为 [start, end]的部分进行就地反转。左闭右闭区间
+        """
+        while start < end:
+            cake[start], cake[end] = cake[end], cake[start]
+            start += 1
+            end -= 1
+        
+    def sort(cake, n):
+        """
+        cake : 表示待反转的序列
+        n: 记录反转的序列部分长度
+        定义：将前 n 块饼排序
+        主要对象是：cake的前 n 项
+        """
+        # base-case
+        # 如果只是要求反转前1个饼，就是不用反转的意思
+        if n == 1:
+            return
+
+        # 寻找 前 n个 饼中 最大的那个饼的索引
+        t = sorted(enumerate(cake[:n]), key = lambda x:x[1], reverse=True)
+        MaxIndex = t[0][0]
+
+        #step1: 反转 MaxIndex 之前的序列，将 最大的饼放在最强面
+        reverse(cake, 0, MaxIndex)
+        res.append(MaxIndex+1)
+        #step2: 将前 n个整体进行反转，这样的话最大的饼干就会到了最后面
+        reverse(cake, 0, n-1)
+        res.append(n)
+
+        # 对子问题进行求解
+        # 递归调用，翻转剩下的烧饼
+        sort(cake, n-1)
+        
+    
+    sort(cakes, len(cakes))
+    return res
+
+print(pancakeSort([3,2,4,1]))
+
+# In[]
+# 前缀和技巧解决子数组问题
+
+ # 其一：暴力的方法 时间复杂度为 O(N**2)
+def subarraySum(nums, k):
+    """
+    定义：算出一个整数数组nums中一共有几个和为 k 的子数组
+    子树组：指的是连续的数组部分（要求连续性）
+    题目是求子树组[j..i]的和为k的子数组的个数，则
+    可以转化为前j项累计和 - 前i-1项累计和的值为k的所有（i，j）对有几个
+    """
+    preSum = [0] # 长度为 n + 1, 初始赋值的0只是为了计算累计值方便，实际没有含义
+    # preSum[i] 表示的是 nums 前 i个元素的累计和 即 [0，1，。。。， i-1]
+    for i in nums:
+        preSum.append(preSum[-1] + i)
+    
+    ans = 0
+    # 最暴力的方法，遍历 假设 子数组为[j..i] 
+    for i in range(1, len(preSum)):
+        for j in range(0, i):
+            if preSum[i] - preSum[j] == k:
+                ans += 1
+    
+
+    return ans
+
+print(subarraySum([1,1,1,2], 2))
+
+# 优化算法 1
+# 暴力破解中的内层循环可以被优化
+# 原因是：内层循环实际上就是在找 能够使得 sum[j] == sum[i] - k 的 j 一共有几个
+# 优化方法是: 直接记录下有几个 sum[j] 和 sum[i] - k 相等，直接更新ans 就不用做循环判断了
+def subarraySum2(nums, k):
+    # 前缀和 -> 该前缀和出现的次数
+    map_j = {0: 1} #构造 sum_j 的哈希映射表， 0：1是base-case, 表示单纯用sum_i == k的情况
+
+    sum_i = 0
+    for i in nums:
+        sum_i += i
+        sum_j = sum_i - k
+        # 判断前面是否有这个前缀和，如果有则更新答案
+        if sum_j in map_j:
+            ans += map_j[sum_j]
+        # 更新前缀和 -> 前缀和出现次数的记录
+        map_j[sum_i] = map_j.get(sum_i, 0) + 1
+    return ans
+
+
+#注：本体的优化技巧有点类似 无序数组的 2Sum问题
+
+print(subarraySum2([1,1,1,2], 2))
+
+# %%
