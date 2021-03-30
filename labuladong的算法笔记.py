@@ -2987,4 +2987,213 @@ def flatten(nums):
 nums = [[1,1],2,[1,1]]
 for i in flatten(nums):
     print(i)
+# In[]
+# 如何高效的寻找素数
+def isPrime(n):
+    for i in range(2, int((n**.5)+1)):
+        if n % i == 0:
+            return False
+    return True
+
+def CountPrimes(n):
+    nums = [True] * (n+1)
+    for i in range(2, int((n**.5)+1)):
+        if isPrime(i):
+            j = i
+            while i*j < n:
+                nums[i*j] = False # 每一个合数都有一个素数因子
+                j += 1 # 控制避免重复 如 2*5 与 5*2 的发生 （ i 代表的是素数因子，而后一个 j 代表的是倍速关系）
+    
+    return sum(nums[2:])
+
+print(CountPrimes(100))
+
+# In[]
+base = 99
+def mypow(a, b):
+    """
+    计算 a的b次方，模 base 的结果
+    模运算公式： (a*b)%base = (a%base)*(b%base)%base
+    """
+    a %= base
+    res = 1
+    for _ in range(b):
+        res = res * a % base 
+    
+    return res
+
+# 如何高效进行模幂运算
+# 时间复杂度为 O(N) N表示的是b列表的长度，其中假定 b列表的每个元素 属于0-9，这就说明 mypow的时间复杂度为 O(1)
+def superPow(a: int, b:list):
+    """
+    计算 a 的 b=[1,2,3,4]次方，也就是 1234次方
+    由于幂运算过大，会有整形溢出的风险, 不能直接进行计算
+    """
+    if len(b) == 0:
+        return 1
+    
+    one  = mypow(a, b.pop())
+    return one * mypow(superPow(a, b), 10) % base
+
+print(superPow(7, [1,2,6,4]))
+
+# 优化： 通过递归来高效求解幂运算
+def mypow2(a, b):
+    if b % 2 == 1: # 如果是 a 的奇数次幂
+        return a * mypow(a, b-1) % base
+    else: #偶数次慕，计算规模减半
+        return mypow(a, b/2)**2 % base
+
 # %%
+# 如何用好二分搜索
+# 暴力解法
+def minEatingSpeed(piles, H):
+    max_ = max(piles)
+    for speed in range(1, max_):
+        # 以速度为 speed 是否可以在 H 小时内吃完
+        if canFinish(piles, speed, H):
+            return speed
+    return max_
+
+# 优化方法 二分搜索
+# 因为暴力解法中的所有可能是有序的线性搜索，因此可以使用二分搜索来降低复杂度
+def minEatingSpeed2(piles, H):
+    right = max(piles)
+    left = 1
+    # 搜索区间为闭区间
+    # 因为找的是最小的速度，因此需要得到的是搜索左边界
+    while left <= right:
+        mid = left + (right - left)//2
+        if canFinish(piles, mid, H):
+            right  = mid - 1
+        else:
+            left = mid + 1
+    
+    return left
+print(minEatingSpeed2([12,2,3,4,2,1,3,2], 17))
+
+# 时间复杂度为 O(N)
+def canFinish(piles, speed, H):
+    total = 0
+    for i in piles:
+        if i <= speed: total += 1
+        else: total += i//speed + 1
+    if total <= H: return True
+    return False
+
+print(minEatingSpeed([12,2,3,4,2,1,3,2], 17))
+
+# 拓展延伸
+# 货物运载问题
+# 暴力破解法
+def shipWithinDays(weights, D):
+    # 列举所有的可能性
+    for cap in range(min(weights), sum(weights)+1):
+        if canDone(weights, cap, D):
+            break
+    return cap
+
+
+# 优化： 二分搜索法
+def shipWithinDays2(weights, D):
+    # 列举所有的可能性
+    left, right = min(weights), sum(weights)
+    while left <= right:
+        mid = left + (right-left)//2
+        if canDone(weights, mid, D):
+            right = mid - 1 #搜索左边界
+        else:
+            left = mid + 1
+
+    return left
+
+# 判断船只在cap容量的时候，是否还可以在 D天内完成任务
+def canDone(weights, cap, D):
+    i = 0
+    for _ in range(D):
+        total = cap - weights[i]
+        while total  >= 0:
+            i+=1
+            if i == len(weights): # 判断是否已经完成运载所有的货物
+                return True
+            total = total - weights[i]
+
+    return False
+
+print(shipWithinDays(list(range(1, 11)), 5))
+print(shipWithinDays2(list(range(1, 11)), 5))
+
+# In[] 
+# 如何高效解决接雨水问题
+# 不要着眼于全局，着眼于每一个元素，也就是木桶i
+# 木桶 i 能装的水为 min(l_max, r_max) - height[i]
+
+# 使用暴力法
+# 时间复杂度为 0(N**2)
+def trap(height):
+    ans = 0
+    for i in range(1, len(height)-1):
+        # 注意一定要包括 i 的，因为 i 有可能是新出现的最高柱子
+        l_max = max(height[:i+1]) # 遍历 i 次， l_max是height[0...i]中的最高柱子的高度
+        # 注意一定要包括 i 的，因为 i 有可能是新出现的最高柱子
+        r_max = max(height[i:]) # 遍历 n - i + 1 次
+        ans += min(l_max, r_max) - height[i]
+    return ans
+
+print(trap([0,1,0,2,1,0,1,3,2,1,2,1]))
+
+
+# 使用备忘录来记录 height[0...i]的最大值 l_max，以及 height[i+1...n-1]的最大值 r_max
+# 优化技巧 去除 内循环， 使用备忘录来记录最大值
+# 备忘录解法： 时间复杂度 下降为 O(N), 空间复杂度也为 O(N)
+def trap2(height):
+    l_max = [height[0]] * len(height)
+    r_max = [height[-1]] * len(height)
+
+    for i in range(1, len(height)-1):
+        l_max[i] = max(l_max[i-1], height[i])
+        j = len(height)-i - 1
+        r_max[j] = max(height[j], r_max[j+1])
+
+    ans = 0
+    for i in range(1, len(height)-1):
+        ans += min(l_max[i], r_max[i]) - height[i]
+    
+    return ans
+
+print(trap2([0,1,0,2,1,0,1,3,2,1,2,1]))
+# 优化技巧三 ： 双指针 ： 左右指针
+# 时间复杂度  O(N), 空间复杂度为 O(1)
+def trap3(height):
+    ans = 0
+    left, right = 0, len(height) -1 # 搜索区间为左闭右闭
+    l_max, r_max = height[0], height[-1]
+    while left <= right:
+        if l_max < r_max:
+            l_max = max(l_max, height[left]) # l_max 是height[0...left]中最高柱子的高度
+            ans += l_max - height[left]
+            left += 1
+        else:
+            r_max = max(r_max, height[right])# r_max 是height[right...n-1]中最高柱子的高度
+            ans += r_max - height[right]
+            right -= 1
+            
+    return ans
+
+print(trap3([0,1,0,2,1,0,1,3,2,1,2,1]))
+
+
+# %%
+# 如何去除有序数组的重复元素
+# 双指针技巧： 前后指针
+def removeDuplicate(nums):
+    if len(nums) <= 1: return nums
+    slow = 0
+    fast = 1
+    while fast != len(nums):
+        if nums[slow] != nums[fast]:
+            slow += 1
+            nums[slow] = nums[fast]
+        fast += 1
+    
+    return nums[:slow+1]
