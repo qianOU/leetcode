@@ -3187,7 +3187,7 @@ print(trap3([0,1,0,2,1,0,1,3,2,1,2,1]))
 # 如何去除有序数组的重复元素
 # 双指针技巧： 前后指针
 def removeDuplicate(nums):
-    if len(nums) <= 1: return nums
+    if len(nums) == 0: return nums
     slow = 0
     fast = 1
     while fast != len(nums):
@@ -3197,3 +3197,78 @@ def removeDuplicate(nums):
         fast += 1
     
     return nums[:slow+1]
+
+print(removeDuplicate([0,0,1,1,2,3,4,5]))
+
+# 对有序链表进行去重
+# 使用 双指针： 前后指针
+def deleteDuplicate(root):
+    if root is None:
+        return None
+    slow = root
+    fast = root.next
+    while fast is not None:
+        if slow.val != fast.val:
+            slow.next = fast
+            slow = slow.next
+        fast = fast.next
+    slow.next = None
+    return root
+
+    
+# In[]
+# 寻找字符串中存在的最长回文子串
+# 回文子串可以是奇数长度的也可以是偶数长度的，所以需要分开讨论
+# 由于对称性，有关找出回文子串的算法题都是 假定回文子串的中兴然后向两侧扩散匹配
+def findLongestSub(s):
+    
+    # 得到 以 i,j为中心的最长回文串
+    def gethuiwen(s, i, j):
+        while i>=0 and j<len(s) and s[i] == s[j]:
+            i-=1
+            j+=1
+        return s[i+1:j]
+    
+    
+    ans = ''
+    for i in range(len(s)):
+        # 得到以 i 为中心的奇数长度的最长回文子串
+        res = gethuiwen(s, i,i)
+        ans = max(ans, res, key=len)
+        # 得到以 i h和 i+1 为中心的偶数长度的最长回文子串
+        res = gethuiwen(s, i, i+1)
+        ans = max(ans, res, key=len)
+    
+    return ans
+print(findLongestSub('abcdcbaaddqwwdqwe'))
+# In[]
+# 如何利用贪心思想玩跳跃游戏
+# 跳跃游戏 I
+# dp解法
+def canJump(nums, i):
+    #状态是 i 表示目前处于nums[i]位置
+    if i>=len(nums):
+        return True
+    
+    for step in range(1, nums[i]+1):
+        if canJump(nums, i+step):
+            print(i+step)
+            return True
+    
+    return False
+
+print(canJump([1,1,1,1,4], 0))
+
+# 跳跃游戏 I 的贪心解法
+def canJump2(nums):
+    farthest = 0 # 记录全局能走的最远处
+    for i in  range(len(nums)):
+        # 不断计算更新全局能走最远处的距离
+        farthest = max(farthest, i + nums[i])
+        # 遇见 0 被卡住的情况，此时达不到终点
+        if farthest <= i: return False
+    return True
+
+
+print(canJump2([1,1,1,1,4]))
+# %%
