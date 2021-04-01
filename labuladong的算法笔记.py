@@ -3252,12 +3252,11 @@ def canJump(nums, i):
     
     for step in range(1, nums[i]+1):
         if canJump(nums, i+step):
-            print(i+step)
             return True
     
     return False
 
-print(canJump([1,1,1,1,4], 0))
+print(canJump([1,3,3,0,4], 0))
 
 # 跳跃游戏 I 的贪心解法
 def canJump2(nums):
@@ -3271,4 +3270,369 @@ def canJump2(nums):
 
 
 print(canJump2([1,1,1,1,4]))
-# %%
+
+
+# 跳跃游戏 II 
+# 寻求最短的跳跃步数（假设是一定能跳跃到最后一个位置的）
+# 方法一：动态规划的做法
+# 时间复杂度 为 O(N**2), 空间复杂度为 O(N)
+def can2Jump(nums):
+    db = [len(nums)] * len(nums) # db[i] 表示从 i 到 尾部所需要的最少步数
+
+    # base case
+    db[-1] = 0
+
+
+    for i in range(len(nums)-2, -1,  -1):
+            # 在状态i能做的选择就是前进 [1...nums[i]]步
+            db[i] = min( # 状态转移方程, 选择步数最小的记录
+                [
+                 db[i],
+                *[db[j]+1  for j in range(i+1,len(nums)) if j-i <= nums[i]],
+                ]
+            )
+    
+    return db[0]
+
+print(can2Jump([2,3,1,1,4]))
+
+# 优化：基于贪心选择性质的方法
+# 时间复杂度 为 O(N), 空间复杂度为 O(1)
+def can2Jump2(nums): 
+    fathest = 0 # 从索引[i...end]跳，最多能到的距离
+    end = 0 # 记录当前 i 能跳到的最远的位置 即 i 最多移动到 end 位置
+    count = 0
+    for i in range(len(nums)-1):
+        fathest = max(nums[i]+i, fathest)
+        if i == end:
+            count += 1
+            end = fathest
+
+    return count
+
+print(can2Jump2([2,3,1,1,4]))
+ 
+
+# In[]
+# 如何利用贪心算法做时间管理  [本质是求最大不相交子集]
+# 最大不相交子集 问题的核心，是使用贪心算法，而贪心选择定义的对象设定为 最早结束的区间
+# 利用贪心算法，每次选择结束时间最早的那项活动
+from operator import getitem
+# 时间复杂度 为 来自排序的O(Nlog(N)),空间复杂度为 O(1) 
+def intervalSchedule(intvs):
+    if len(intvs) == 0: return 
+    fast_end = sorted(intvs, key = lambda x:getitem(x, 1))
+    count = 0
+    min_end = 0
+    for i in fast_end:
+        if i[0]>=min_end: # 遇见不重复的子区间
+            count += 1
+            min_end = i[1]
+    return count
+
+print(intervalSchedule([[0,3],[2,4],[3,6]]))
+
+# 无重叠区间
+def eraseOverlapIntervals(intvs):
+    if len(intvs) == 0: return 
+    fast_end = sorted(intvs, key = lambda x:getitem(x, 1))
+    count = len(intvs)
+    min_end = 0
+    for i in fast_end:
+        if i[0]>=min_end: #如果遇见不重复的区间
+            count -= 1 # 不进行去除
+            min_end = i[1]
+    return count
+
+print(eraseOverlapIntervals([[1,2],[2,3],[3,4],[1,3]]))
+
+# 用最少的箭头暴击更多的气球
+# 与前面不同的是，射击气球时 end 与 start 相交也是被认为是区间重复，
+# 可以一次设计造成两个气球都被破坏
+def findMinArrowShots(intvs):
+    count = 0
+    min_end = -1 #因为区间边界重合也被认为是重合情况
+    intvs = sorted(intvs, key=lambda x: getitem(x, 1))
+
+    for i in intvs:
+        if i[0] > min_end:
+            count +=1
+            min_end = i[1]
+    return count
+
+print(findMinArrowShots([[10,16], [2,8], [1,6], [7, 12]]))
+
+# In[]
+# 如何判断括号的合法性
+# 时间复杂度为 O(N), 空间复杂度为 O(N)
+def isValid(s):
+    stack = []
+    info = dict(zip('([{',')]}'))
+
+    for i in s:
+        if i in '([{':
+            stack.append(i)
+        else:
+            if not stack or i != info[stack[-1]]:
+                return False
+            stack.pop()
+    
+    return len(stack)==0
+
+print(isValid('([{]])()'))
+
+# In[]
+# 如何调度考生位置
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# In[]
+# Union-Find 算法
+# 使用森林（若干棵树）来表示图的动态连通性，用数组来具体实现这个森林
+class UnionFind:
+    # 假定 node 是 规整的无间隔的严格单调递增数组
+    def __init__(self, n):
+        # n 代表创建 n 个节点
+        self.parents  = [] #构建一个存放 结点的父节点 的列表
+        self.size = [] # 树存放以 i 为根结点的树的规模大小
+        for i in range(n):
+            self.parents.append(i) # 初始化时由于结点具有自反性，所以初始时，结点的父节点为自身
+            self.size.append(1) # 初始化每个树，只有自身一个结点
+        self._count = n
+    
+    # 进行连接
+    # 将 a 连接到 b 上
+    def union(self, a, b):
+        root_a = self.find(a) # 找寻 a 的根结点
+        root_b = self.find(b) # 找寻 b 的根结点
+        if root_a == root_b: return
+        self.parents[root_a] = root_b # 将 a 的根结点的父节点指向 b
+        self._count -= 1
+    
+    # 找寻 a 的根节点
+    # 最初邦本的 find ，最坏时间复杂度为 O(N)
+    # 由于 find， union， connect 需要频繁调用 find ，所以 find 的时间内复杂度必须降低
+    def find(self, a):
+        # 当找寻到 自反结点时，就返回
+        while self.parents[a] != a:
+            a = self.parents[a]
+        return a
+    
+    # 优化之一： 采用 平衡性优化
+    # 即每次将较小的树，连接上较大的树结点之上
+    # 需要开辟一个数组存放每个子树的规模尺度，最坏时间复杂度与 树的深度相关 下降为 O(logN)
+    def union(self, a, b):
+        # print(a, b)
+        root_a = self.find(a) # 找寻 a 的根结点
+        root_b = self.find(b) # 找寻 b 的根结点
+        if root_a == root_b: return
+        # 平衡性优化 
+        # 子树重量相等的情况下，优先将 root_b 作为根节点
+        if self.size[root_a] <= self.size[root_b]: # 如果 a树 的规模小于 b 树的规模
+            self.parents[root_a] = root_b # 将 a 的父节点指向 b
+            self.size[root_b] += self.size[root_a]
+        else:
+            self.parents[root_b] = root_a
+            self.size[root_a] += self.size[root_b]
+        self._count -= 1
+
+    # 优化操作3 ： 路劲压缩
+    # 将树的深度压缩为 常树级别， 不超过 3
+    # 最坏时间复杂度为 O(1)
+    def find(self, a):
+        while self.parents[a] != a:
+            # 进行路劲压缩
+            self.parents[a] = self.parents[self.parents[a]]
+            a = self.parents[a]
+        return a
+
+    # 最后使用 路劲压缩 与 平衡优化组合使用才是效率最佳的实现
+    
+    # 查看 a 与 b 的连同状态
+    def connected(self, a, b):
+        root_a = self.find(a)
+        root_b = self.find(b)
+        return root_a == root_b
+
+    # 返回图中有多少个连通分量
+    # 注意 如果 a 与 b 是连通的，则只计为 一个 连通分量 
+    def count(self):
+        return self._count
+
+
+# In[]
+# Union-Find算法应用
+"""
+算法的三个关键点：
+1. 用parents数组记录每个结点的父节点，所以实际上数组内存储着一个森林（若干棵多叉树）是动态连通性的主要体些
+2. 用size数组记录每棵子树的重量，目的是在使用连接union子树时，树能有平衡性，而不会退化成链表
+3. 在find函数中使用路径压缩技巧，可以使得树的深度维持在常数范围之内
+
+Union-Find 算法 主要思想是适时增加虚拟节点，想办法让元素”分门别类“建立动态连通关系
+"""
+
+# Union-Find 作为 DFS 的替换方案
+def solve(board): 
+    m, n = len(board), len(board[0])
+    
+    # 传统的 dfs 算法
+    def dfs(board, i, j): 
+        # base-case 
+        # 确定索引是否越界
+        if i < 0 or i >= m or j < 0 or j >= n:
+            return 
+        # 如果当前位置不是需要搜寻的 位置 则返回
+        if board[i][j] != '0':
+            return 
+        
+        # 将与边界相连的 0 位置，设置为 #
+        board[i][j] = '#'
+        # 查询 上下左右
+        dfs(board, i+1, j)
+        dfs(board, i-1, j)
+        dfs(board, i, j-1)
+        dfs(board, i, j+1)
+
+
+    # 主要思路是将与边界相连的 0 首先 变化成 #，之后将 所有的 0 变化为 x
+    # 最后将 # 还原为 0，  这样也就将 棋盘中所有 被 x 包围 的 0 替换成为 x 了
+
+    # 将首列，和尾列关联的 0 变化成 #
+    for i in range(m):
+        dfs(board, i, 0)
+        dfs(board, i, n-1)
+
+    # 将首行，和尾行关联的 0 变化成 #
+    for i in range(n):
+        dfs(board, 0, i)
+        dfs(board, m-1, i)
+
+
+    # 将棋盘中所有的 0 变化成为 x
+    for i  in range(1, m-1):
+        for j in range(1, n-1):
+            if board[i][j] == '0':
+                board[i][j] = 'x'
+    
+    # 将 # 还原为 o
+    for i  in range(0, m):
+        for j in range(0, n):
+            if board[i][j] == '#':
+                board[i][j] = '0'
+    
+    return board
+
+
+board = [['x']*5 for i in range(4)]
+board[0][-1] = '0'
+board[1][-2] = '0'
+board[2][0] = '0'
+board[2][1] = '0'
+board[2][3] = '0'
+board[-1][1] = '0'
+import copy
+board2 = copy.deepcopy(board) # 主要用来 对 union-find 算法进行测试
+print('\n\r'.join(''.join(i) for i in solve(board)))
+
+# 方法二： 使用 Union-Find 算法
+def solve2(board):
+    """
+    主要思路： 构建一个 dummy 节点，所有 0 不能被 x 替换的节点，都与dummy节点连通
+              之后将所有不与 dummy节点连通的 0 节点值用 x 来替代
+              将二维棋盘 压缩为 1维，方便使用 Union-Find 算法
+
+            PS: 需要实例化 UnionFind 类（在上一个）
+    """
+    m, n = len(board), len(board[0])
+    dummy = m*n
+    uf = UnionFind(m*n+1) # 加 1 是为了 加上 dummy 节点
+    
+     # 将首列，和尾列关联的 0 与 dummy 节点进行连同
+    for i in range(m):
+        if board[i][0] == '0':
+            uf.union(i*n, dummy)
+        if board[i][n-1] == '0':
+            uf.union(i*n+n-1, dummy) 
+
+     # 将首行，和尾行关联的 0 与 dummy 节点进行连同
+    for i in range(n):
+        if board[0][i] == '0':
+            uf.union(i, dummy)
+        if board[m-1][i] == '0':
+            uf.union(i + n*(m-1), dummy) 
+
+    # 构建一个向上下左右搜索数组， 假定以（0，0） 为中心
+    d = [[-1, 0], [1, 0], [0, 1], [0, -1]]
+    for i in range(1, m-1):
+        for j in  range(1, n-1):
+            if board[i][j] == '0': # 如果 【i,j】 是 0
+                # 查看 [i,j] 的周边节点，如果是 0, 
+                # 将此 0 与 上下左右的 0 连通
+                for (ii, jj) in d:
+                    x = i + ii
+                    y = j + jj
+                    if board[x][y] == '0':
+                        uf.union(x*n+y, i*n+j)
+    
+    # 最后 利用 connect 方法，检测 节点是否 与 dummy 节点连通 
+    for i in range(m):
+        for j in range(n):
+            if  not uf.connected(i*n+j, dummy):
+
+                board[i][j] = 'x'
+
+    return board
+
+print('\nusing union-find method\n')
+print('\n\r'.join(''.join(i) for i in solve2(board2)))
+
+# 判定合法等式
+def equationsPossible(equations:list):
+
+    base = ord('a') # 确定基准 字符 a 的 ascii码值
+    uf = UnionFind(26) # 26个小写字符
+    
+    # 检测等式，如果是 == 运算符，表示左右两边的 字符是连通的
+    for i in equations:
+        if i[1] == '=':
+            # 将相等关系的符号，表示为同一个连通的状态
+            uf.union(ord(i[0])-base, ord(i[-1])-base)
+    
+    # 检测是否有等式冲突的情况
+    for i in equations:
+        if i[1] == '!':
+            if uf.connected(ord(i[0])-base, ord(i[-1])-base):
+                return False
+    
+    return True # 如果没有冲突的情况
+print()
+print(equationsPossible(['a==b','a==c','b==c']))
+print(equationsPossible(['a==b','a==c','b!=c']))
+
+
+# Nim 游戏
+# 有点类似脑经急转弯， 需要反推，找寻规律
+def canWinNim(n):
+    # 如果上来就是 4 的倍数，那就只能认输
+    # 否则可以把对方控制在 4 的倍数，必胜
+    return n%4 == 0
+
+# 石子游戏
+def stoneGame(piles):
+    # 己方先手可以选择拿所有的奇数组，或者偶数组，（因为石子数量为奇数。所以奇数或者偶数组中一定有一组比另外一组多）
+    return True
+
+def bulbSwitch(n):
+    return int(n**.5)
+ # %%
