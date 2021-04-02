@@ -8,11 +8,6 @@ class ListNode(object):
         return str(self.val)
 
 
-def print_link(head):
-    while head is not None:
-        print(head.val)
-        head = head.next
-
 
 class Solution(object):
     def mergeTwoLists(self, l1, l2):
@@ -49,6 +44,12 @@ class Solution(object):
 
         head = backtrace(l1, l2)
         return head
+
+
+def print_link(head):
+    while head is not None:
+        print(head.val)
+        head = head.next
 
 
 l1 = [5]

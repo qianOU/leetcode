@@ -22,7 +22,7 @@ class Solution(object):
         
         return prev
 
-
+    # 递归方法
     def reverseList(self, head):
         """
         :type head: ListNode
