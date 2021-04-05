@@ -24,7 +24,7 @@ class Solution(object):
         if tmp:
             ans.add(int(tmp))
         
-        print(ans)
+
         return len(ans)
 
 print(Solution().numDifferentIntegers("leet1234code234"))

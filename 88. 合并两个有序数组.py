@@ -11,14 +11,16 @@ class Solution(object):
         p2 = n-1
         i = m+n-1
         while p1 >= 0 and p2 >= 0:
-            if min(p1, p2) >=0  and nums1[p1] >= nums2[p2]:
+            if nums1[p1] >= nums2[p2]:
                 nums1[i] = nums1[p1]
                 p1 -= 1
                 i -= 1
-            if min(p1, p2) >=0  and nums1[p1] < nums2[p2]:
+            if  nums1[p1] < nums2[p2]:
                 nums1[i] = nums2[p2]
                 p2 -= 1
                 i -= 1
+
+        # 由于就是保存 在nums1中，且是从后往前进行·覆盖，所以只要考虑 nums2 中元素都比加小，需要覆盖nums1前部分的情况
         if p2>=0:
             nums1[:i+1] = nums2[:p2+1]
             i = -1

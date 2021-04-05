@@ -14,19 +14,20 @@ class Solution(object):
             return False
         
         slow = head
-        fast = head.next.next
-        while slow != fast:
+        fast = head
+        while head is not None and head.next is not None:
             slow = slow.next
-            if fast is None or fast.next is None:
-                return False
-            else:
-                fast = fast.next.next 
+            fast = fast.next.next 
+            if fast == slow: # 相遇作为 while 的内部退出循环条件
+                break
+        
         know = slow
         slow = head
-        while fast != know:
+        while 1:
             fast = fast.next
             slow = slow.next
+            if fast == know:
+                print('环状起点为：', fast.val,slow.val)
+                break
 
         return True
-
-            
