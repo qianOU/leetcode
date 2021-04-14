@@ -31,6 +31,10 @@
 
 #### 位运算符 运算的 优先级是 低于 数学运算符的
 
+<hr>
+
+#### 有关于 2 的 幂函数，都可以通过位运算进行
+
 ## 树
 
 ### 二叉搜索树
@@ -38,6 +42,90 @@
 1. 二叉搜索树的==中序遍历==得到的是==单调递增==的序列
 
     
+
+### 完全二叉树
+
+1. 根节点在 0 层， 第h层的节点数是 2^h,
+2. 排列是紧密靠左的，因此对于最大层数为 h 的完全二叉树，节点个数一定在 [2^h ,2^(h+1) −1] 的范围内，可以在该范围内通过`二分查找`的方式得到完全二叉树的节点个数。
+3. 如果 h 层是满节点，那么节点总数是 2^(h+1) - 1
+4. ==对于二叉树每一个节点的路径可以抽象为数字的二进制表示==，除了最高位，每一位都可以抽象为节点路径的一次选择，0表示选择左子树，1 表示右子树 ，从==次高位到最低位表示的是树从根节点开始选择的路径==
+
+### 迭代 中序遍历
+
+```python
+class Solution:
+    def inorderTraversal(self, root: TreeNode) -> List[int]:
+        if root is None:
+            return []
+        # 隐含栈
+        stack = []
+        # 把当前节点的完全左子树路径压入栈
+        def order(root):
+            while root is not None:
+                stack.append(root)
+                root = root.left
+        
+        order(root) # 将根节点的完全左子树路径部分压入栈
+        ans = []
+        while stack:
+            top = stack.pop() # 栈顶元素即为 最左端元素 出栈
+            ans.append(top.val)
+            order(top.right) # 将当前节点的右子树部分也入栈
+            
+        
+        return ans
+```
+
+
+
+### 迭代 前序遍历
+
+````python
+class Solution:
+    def postorderTraversal(self, root: TreeNode) -> List[int]:
+        if root==None:
+            return []
+        stack=[root]
+        res=[]
+        while stack:
+            s=stack.pop()
+            res.append(s.val)
+            # 前序 要求 root left left 所以子节点要求倒序入栈
+            if s.right:
+                stack.append(s.right)
+            if s.left
+                stack.append(s.left)
+        return res
+````
+
+### 迭代 后序遍历
+
+```python
+# 由于 前序遍历的顺序 是 root left right
+# 而后序遍历的顺序为 left right root,倒转一下就是 root right left
+# 恰巧就是 前序遍历中 左右子节点交换位置部分，最后再翻转成原状态即可
+class Solution:
+    def postorderTraversal(self, root: TreeNode) -> List[int]:
+        if root==None:
+            return []
+        stack=[root]
+        res=[]
+        while stack:
+            s=stack.pop()
+            res.append(s.val)
+            if s.left:#与前序遍历相反
+                stack.append(s.left)
+            if s.right:
+                stack.append(s.right)
+        return res[::-1] # 翻转回原状态
+
+```
+
+
+
+### 找寻最大的第k个元素
+
+使用 生成器来 惰性生产值，这样只需要生成k个即可，节约了时间
 
 ## 类型
 
@@ -67,7 +155,7 @@
                     yield from dfs(node.right)
     
             return list(dfs(root1)) == list(dfs(root2))
-    
     ```
-
     
+
+

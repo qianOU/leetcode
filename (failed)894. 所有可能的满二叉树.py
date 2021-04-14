@@ -6,6 +6,8 @@ class TreeNode:
         self.right = right
 class Solution:
     def allPossibleFBT(self, n: int) -> List[TreeNode]:
+        if n < 1:
+            return []
         root = TreeNode(0)
         import copy
         self.ans = []
