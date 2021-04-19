@@ -12,10 +12,15 @@ class CBTInserter:
         self.index = 0
 
     def insert(self, v: int) -> int:
-        self.ans.append(TreeNode(v))
+        item = TreeNode(v)
+        self.ans.append(item)
         self.index += 1
         par = (self.index-1) // 2
-        retur self.ans[self.index].val
+        if par%2:
+            self.ans[par].left = item
+        else:
+            self.ans[par].right = item
+        return self.ans[par].val
 
 
     def get_root(self) -> TreeNode:
