@@ -39,7 +39,7 @@ class Solution:
 
         # return longest
         """优雅的写法"""
-        # 递归函数 定义 为 以 root 为 箭头其实的树 能为 其 父节点提供的最长路径长度
+        # 递归函数 定义 为 以 root 为 箭头起始的树 能为 其 父节点提供的最长路径长度
         # 注意这里 使用了箭头起点， 也就意味着 root 是在 同值路径之上的
         longest_arr = 0
         def arr_length(root):
