@@ -14,7 +14,6 @@ class Solution:
 
         for i in range(m):
             for j in range(n):
-                # max_area = max(max_area, matrix[i][j])
                 for i2 in range(i, m):
                     for j2 in range(j, n):
                         item = records[(i2, j2)] - records[(i, j2)] - records[(i2, j)] + records[(i, j)]
