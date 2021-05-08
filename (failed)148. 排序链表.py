@@ -1,8 +1,12 @@
 # Definition for singly-linked list.
-# class ListNode:
-#     def __init__(self, val=0, next=None):
-#         self.val = val
-#         self.next = next
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+    
+    def __repr__(self):
+        return str(self.val)
+
 class Solution:
     # 使用快速排序
     def sortList(self, head: ListNode) -> ListNode:
@@ -60,7 +64,71 @@ class Solution:
 class Solution:
     # 使用归并排序
     def sortList(self, head: ListNode) -> ListNode:
+        def merge(a, b):
+            pre = dummy = ListNode(float('-inf'))
+            dummy.next = a
+
+            #找到尾部节点
+            # while a.next:
+            #     a = a.next
+            # dummy_last = a
+            prev = dummy
+            while b and dummy:
+                # print(b, dummy)
+                if b.val < dummy.val:
+                    next = b.next
+                    prev.next = b
+                    b.next = dummy
+                    dummy = b
+                    b = next
+                    
+                    
+                    
+
+                prev = dummy
+                dummy = dummy.next
+                
+                
+                
+            if b:
+                prev.next = b # 将dumy尾部和 b 接上
+
+            return pre.next
+
+        # 左闭右开区间
+        def getmid(left, right):
+            slow = fast = left
+            while fast and fast.next:
+                fast = fast.next.next
+                slow = slow.next
+            
+            return slow
         
+        def sort(left, right):
+            print(left, right)
+            if left is right:
+                return None
+            if left.next is right:
+                return left
+            mid = getmid(left, right)
+            b = mid.next
+            mid.next = None
+            tmp1 = sort(left, mid)
+            tmp2 = sort(mid, right)
+            return merge(tmp1, tmp2)
+        
+        return sort(head, None)
 
 
+dum = pre = ListNode()
+for i in [4,2,1,3]:
+    tmp = ListNode(i)
+    dum.next = tmp
+    dum = dum.next
 
+def print_(a):
+    while a:
+        print(a)
+        a  = a.next
+
+print_(Solution().sortList(pre.next))
