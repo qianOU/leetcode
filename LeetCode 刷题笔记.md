@@ -159,6 +159,21 @@ class Solution:
 
 ==注意：== 树的题目，使用DFS解法时，一定要注意迭代方式 
 
+
+
+## 堆与优先队列
+
+1. 优先队列 一个 item 可以 存放 多个元素
+
+```python
+from queue import PriorityQueue as pq
+q = pq()
+
+q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
+```
+
+
+
 ## 类型
 
 ### 动态规划
@@ -238,4 +253,6 @@ class Solution:
 ### 1. 常见的有基于 索引 的二分查找
 
 ### 2. 基于 值 的二分查找也是十分重要的
+
+eg: [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-sorted-matrix/)
 
