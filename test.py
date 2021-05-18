@@ -56,4 +56,54 @@ def quick(left, right): # 左闭右开
             quick(l, right)
 
 quick(0, len(arr))
-print(arr)
+# print(arr)
+
+
+def quick_select(l, r, target):
+    import random
+
+    if l > r:
+        return 
+    mid = random.randint(l, r)
+    K = nums[mid]
+    nums[mid], nums[r] = nums[r], nums[mid]
+    lo = l
+    hi = r - 1
+    count = -1
+    while lo <= hi:
+        if lo <= hi and nums[lo] <= K:
+            lo += 1
+        elif lo<=hi and nums[hi] < K:
+            nums[lo], nums[hi] = nums[hi], nums[lo]
+            hi -= 1
+        else:
+            hi -= 1
+    
+    nums[lo], nums[r] = nums[r], nums[lo]
+    if lo - l + 1 == target:
+        return nums[lo]
+    elif lo - l + 1 > target:
+        return quick_select(l, lo-1, target)
+    else:
+        return quick_select(lo+1, r, target-lo+l-1)
+
+nums = list([1,2,3])
+
+print(quick_select(0, len(nums)-1, (len(nums)+1)//2+1))
+
+
+class Solution:
+    def containsNearbyAlmostDuplicate(self, nums, k: int, t: int) -> bool:
+        from functools import cmp_to_key
+        n = len(nums)
+        res = [[] for i in range(n)]
+        for i in range(n):
+            res[i].extend(nums[max(0, i-k):min(n, k+i+1)])
+            a = min(res[i], key=cmp_to_key(lambda x, y: abs(x-y)))
+            print(res[i], a)
+            if a <= t:
+                return True
+        
+        return False
+
+print(Solution().containsNearbyAlmostDuplicate([1,2,3,1], 3, 0))
