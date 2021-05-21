@@ -107,3 +107,31 @@ class Solution:
         return False
 
 print(Solution().containsNearbyAlmostDuplicate([1,2,3,1], 3, 0))
+
+
+# 并查集
+class Ufoid:
+            def __init__(self, n):
+                self.roots = list(range(n))
+                self.count = n
+            
+            def find(self, a):
+                while a != self.roots[a]:
+                    item = self.roots[a]
+                    self.roots[a]  = self.roots[item] # 压缩路径
+                    a = self.roots[a]
+                return a
+            
+            def connect(self, a, b):
+                return find(a) == find(b)
+            
+            def union(self, a, b):
+                root_a, root_b = self.find(a), self.find(b)
+                if root_a == root_b:
+                    return
+                elif root_a <= root_b:
+                    self.roots[root_b] = root_a
+                else:
+                    self.roots[root_a] = root_b
+                
+                self.count -= 1

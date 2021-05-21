@@ -1,7 +1,6 @@
 class Solution:
     def countArrangement(self, n: int) -> int:
         count = 0
-        
 
         def back_track(i, path):
             nonlocal count
@@ -23,5 +22,3 @@ class Solution:
 
         return count
                 
-
-print(Solution().countArrangement(3))
