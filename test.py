@@ -135,3 +135,30 @@ class Ufoid:
                     self.roots[root_a] = root_b
                 
                 self.count -= 1
+
+
+num = [1, 2, 10, 1, 5, 10, 3, 3, 7, 2, 14, 14, 7, 7, 2, 6, 0, 1, 9, 2, 2, 3, 5, 4, 1, 5, 4, 6, 1, 14, 0, 6, 
+5, 10, 1, 4, 6, 0, 6, 14]
+n = len(num)
+memory = {}
+def dfs(l, r, h):
+    if not h:
+        return 0
+    if memory.get((l, r)):
+        return memory[(l, r)]
+    hl = num[l-1] if l >0 else 0
+    hr = num[r+1] if r<n-1 else 0
+    
+    left = right = 0
+    if  hr:
+        right = dfs( l, r+1, min(h, hr))
+    if hl:
+        left = dfs( l-1, r, min(hl, h))
+
+    ans = max(left, right, h*(r-l+1))
+    memory[(l, r)] = ans
+    return ans
+
+for i in range(n):
+    i = 16
+    print(i, dfs(i,i, num[i]))
