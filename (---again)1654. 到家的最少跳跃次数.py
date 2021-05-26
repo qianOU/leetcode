@@ -15,7 +15,9 @@ class Solution:
                 # print(cur, back_time)
                 if cur == x:
                     return count
-                elif cur in forbidden:
+                # 如果最优路径是出界的，可以调整前后跳的顺序让其不出界，所以最优解一定在界内
+                # 注意这个 6000 是怎么得来的， 参考大神数学解析
+                elif cur in forbidden or cur > 6000:
                     continue
                 else:
                     # 0 代表到 cur + a 是前进的步骤
@@ -32,8 +34,3 @@ class Solution:
         
         
         return -1
-
-print(Solution().minimumJumps([162,118,178,152,167,100,40,74,199,186,26,73,200,127,30,124,193,84,184,36,103,149,153,9,54,154,133,95,45,198,79,157,64,122,59,71,48,177,82,35,14,176,16,108,111,6,168,31,134,164,136,72,98]
-,29
-,98
-,80))
