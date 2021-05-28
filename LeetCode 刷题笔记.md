@@ -13,6 +13,7 @@
 9. 二维矩阵的斜对角线遍历规则
     * 主对角线： $j - i = k$
     * 副对角线： $j + i = k$
+10. Python的整数除法是向`-∞`取整的
 
 ## 位运算
 
@@ -50,6 +51,7 @@
 
 1. 我们知道在树（甚至图）中，**所有节点的入度之和等于出度之和**
 2. 树的修改需要借助 递归 的方式
+3. 要求树的深度最小，一般需要联想到平衡性，【中点性质】
 
 ### 二叉搜索树
 
@@ -235,6 +237,49 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
     
 2. 逆序处理序列，需要想到利用栈来处理
 
+    ### 单调栈
+
+    1. 单调栈可以用来找寻第一个大于/ 小于 某个元素的索引
+
+    2. 单调栈用于求一类 next greater number 问题，时间复杂度为 0(N)
+
+    3. 在接雨水等问题中，需要同时确定左右边界，左边界（小于 nums[i] 的左侧第一个元素索引）， 右边界（小于nuns[i]的右侧第一个元素索引），可以使用两个单调栈来维护处理。
+
+        ```python
+        # 右边界的确定
+        stack = []
+                for i in range(n):
+                    more_less[i][0] = nums[i]
+                    # 栈顶元素如果大于 nums[i] 也就意味着找到右边界
+                    while stack and nums[stack[-1]] > nums[i]:
+                        item = stack.pop()
+                        more_less[item][-1] = i
+                    stack.append(i)
+                # 还保留在栈中的元素，就是无右边界，设置为n
+                while stack:
+                    item = stack.pop()
+                    more_less[item][-1] = n
+        
+           
+        # 左边界的确定            
+                stack = []
+                for i in range(n-1, -1, -1):
+                    # 栈顶元素如果大于 nums[i] 也就意味着找到左边界
+                    while stack and nums[stack[-1]] > nums[i]:
+                        item = stack.pop()
+                        more_less[item][1] = i+1 # 因为浅醉和每一个元素都是左闭右开的，所以左边界要+1
+        
+                    stack.append(i)
+                # 还保留在栈中的元素，就是无左边界，设置为0, presum[0] == 0
+                while stack:
+                    item = stack.pop()
+                    more_less[item][1] = 0
+        ```
+
+        
+
+    
+
 ## 链表
 
 1.  **环形链表**
@@ -271,6 +316,10 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
 
     ​	a + b < b + a 说明 a 在b 前面， b 在 a 后面结合
 
+### 查看值是否落入某个定长的范围内的时候，使用桶排序
+
+
+
 
 
 ## 二分查找
@@ -282,6 +331,39 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
 eg: [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-sorted-matrix/)
 
 
+
+## 滑动窗口
+
+1. 在使用滑动窗口技巧的时候，有时没必要保持窗口元素的有序性的时候，可以使用队列即【普通列表】进行存储。
+
+2. 在有些题目里面，保持窗口元素的有序性是十分有必要的，可以使用【有序列表】数据结构，甚至可以搭配二分搜索来使用，降低时间复杂度。[220. 存在重复元素 III](https://leetcode-cn.com/problems/contains-duplicate-iii/)
+
+    ```python
+    # 导入 有序列表 数据结构
+    from sortedcontainers import SortedList
+    
+    class Solution:
+        def containsNearbyAlmostDuplicate(self, nums: List[int], k: int, t: int) -> bool:
+            # O(N logk)
+            window = SortedList()
+            for i in range(len(nums)):
+                # len(window) == k
+                if i > k: # 窗口滚动
+                    window.remove(nums[i - 1 - k])
+                window.add(nums[i]) # 保证插入有序
+                # 找寻 小于 nums[i] 的最大索引值
+                idx = bisect.bisect_left(window, nums[i])
+                if idx > 0 and abs(window[idx] - window[idx-1]) <= t:
+                    return True
+                if idx < len(window) - 1 and abs(window[idx+1] - window[idx]) <= t:
+                    return True
+            return False
+    
+    ```
+
+    
+
+3. 
 
 ## 并查集
 
