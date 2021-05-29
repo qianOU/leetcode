@@ -14,6 +14,8 @@
     * 主对角线： $j - i = k$
     * 副对角线： $j + i = k$
 10. Python的整数除法是向`-∞`取整的
+11. `坑`：
+     1. 对于大数， 如果直接 float 转换成 int 会发生==精度损失==，所以在 类型转换的时候需要特别注意。可以使用decimal 实现高精度的浮点计算。
 
 ## 位运算
 
@@ -318,9 +320,31 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
 
 ### 查看值是否落入某个定长的范围内的时候，使用桶排序
 
+### 基数排序
 
+1. 基数排序是一种不基于比较的排序算法，时间复杂度为 0(n)[基数排序_百度百科 (baidu.com)](https://baike.baidu.com/item/基数排序)
 
+    ```python
+    import math
+     
+    def sort(a, radix=10):
+        """a为整数列表， radix为基数"""
+        # 这里的 + 1 十分关键
+        K = math.ceil(math.log(max(a), radix)) + 1 # 用K位数可表示任意整数, 注意需要加 1，因为是实际中 数字的长度， == len(str(max(a)))
+        
+        bucket = [[] for i in range(radix)] # 不能用 [[]]*radix
+        for i in range(1, K+1): # K次循环
+            for val in a: # 个位数 -> 十位数 ->...不断入桶再合并的过程
+                bucket[val%(radix**i)/(radix**(i-1))].append(val) # 析取整数第K位数字 （从低到高）
+            del a[:]
+            for each in bucket:
+                a.extend(each) # 桶合并
+            bucket = [[] for i in range(radix)]
+    ```
 
+    
+
+### 桶排序
 
 ## 二分查找
 
