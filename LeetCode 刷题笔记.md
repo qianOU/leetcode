@@ -25,6 +25,7 @@
 1.交换律(异或可以交换位置)：a ^ b ^ c <=> a ^ c ^ b
 2.任何数与0异或为任何数 0 ^ n => n
 3.相同的数异或为0: n ^ n => 0
+4 4i⊕(4i+1)⊕(4i+2)⊕(4i+3)=0 # 异或的性质 1^2^3 = 0
 ```
 
 1. 异或运算 可以 用于找出字符串中出现奇数次的那唯一一个单词. 可以用于处理==判别回文序列==
@@ -44,8 +45,9 @@
 #### 位运算符 运算的 优先级是 低于 数学运算符的
 
 <hr>
-
 #### 有关于 2 的 幂函数，都可以通过位运算进行
+
+
 
 ## 树
 
@@ -335,7 +337,7 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
         bucket = [[] for i in range(radix)] # 不能用 [[]]*radix
         for i in range(1, K+1): # K次循环
             for val in a: # 个位数 -> 十位数 ->...不断入桶再合并的过程
-                bucket[val%(radix**i)/(radix**(i-1))].append(val) # 析取整数第K位数字 （从低到高）
+                bucket[val%(radix**i)//(radix**(i-1))].append(val) # 析取整数第K位数字 （从低到高）
             del a[:]
             for each in bucket:
                 a.extend(each) # 桶合并
