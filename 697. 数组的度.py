@@ -6,7 +6,7 @@ class Solution:
         for i in range(n):
             dic[nums[i]].append(i)
         
-        print(dic)
+
         ans, most =n, 0
         for a in dic.values():
             if len(a) > most:
@@ -14,7 +14,7 @@ class Solution:
                 ans = a[-1]-a[0]+1
             elif len(a) == most:
                 ans = min(a[-1]-a[0]+1, ans) 
-            print(most, a)
+
         return ans
 
 

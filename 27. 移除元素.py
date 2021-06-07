@@ -11,9 +11,6 @@ class Solution:
 
             nums[l], nums[r] = nums[r], nums[l]
         
-        return l
+        return l # 因为 上述循环的递归出口是 l>=r 且 nums[l] == val
 
 
-print(Solution().removeElement(
- [0,1,2,2,3,0,4,2], val = 2
-))

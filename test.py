@@ -162,3 +162,21 @@ def dfs(l, r, h):
 for i in range(n):
     i = 16
     print(i, dfs(i,i, num[i]))
+
+
+# 素数删表法
+def prime(n):
+    for i in range(2, int(n**.5)+1):
+        if n % i:
+            return False
+    return True
+
+def prime_table(n):
+    ans = [True]*(n+1)
+    for x in range(2, int(n**.5+1)):
+        if prime(x):
+            for j in range(x**2, n, x):
+                ans[x] = False # 素数的倍数，不是素数
+    
+    # 返回素数的个数
+    return sum(ans[2:])
