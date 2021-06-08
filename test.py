@@ -58,35 +58,37 @@ def quick(left, right): # 左闭右开
 quick(0, len(arr))
 # print(arr)
 
-
-def quick_select(l, r, target):
-    import random
-
-    if l > r:
-        return 
-    mid = random.randint(l, r)
-    K = nums[mid]
-    nums[mid], nums[r] = nums[r], nums[mid]
-    lo = l
-    hi = r - 1
-    count = -1
-    while lo <= hi:
-        if lo <= hi and nums[lo] <= K:
-            lo += 1
-        elif lo<=hi and nums[hi] < K:
-            nums[lo], nums[hi] = nums[hi], nums[lo]
-            hi -= 1
-        else:
-            hi -= 1
+# 快排 找寻 第 k 小的元素
+def quick_select(left, right, k): # 闭区间
     
-    nums[lo], nums[r] = nums[r], nums[lo]
-    if lo - l + 1 == target:
-        return nums[lo]
-    elif lo - l + 1 > target:
-        return quick_select(l, lo-1, target)
-    else:
-        return quick_select(lo+1, r, target-lo+l-1)
+    idx = random.randint(left, right)
+    t = nums[idx]
+    # 将 t 交换到最后一个位置
+    nums[idx], nums[right] = nums[right], nums[idx]
 
+    l, r = left, right - 1
+    while l <= r:
+        while l <= r and nums[l] < t:
+            l += 1
+        
+        while l <= r and nums[r] > t:
+            r -= 1
+        
+        if l>=r: break
+        nums[l], nums[r] = nums[r], nums[l]
+        l, r = l+1, r-1
+
+    # nums[l] 可能大于等于 t
+    nums[l], nums[right] = nums[right], nums[l]
+    # 查看区间[left...l]是否有k个元素
+    if l - left + 1 == k:
+        return t
+    elif l - left + 1 > k:
+        # 在[left, l-1/r] 中寻找 k 个元素
+        return quick_select(left, l-1, k)
+    else:
+        # 在[l+1, right] 找寻 k-(l-left+1) 个元素
+        return quick_select(l+1, right, k-(l-left+1))
 nums = list([1,2,3])
 
 print(quick_select(0, len(nums)-1, (len(nums)+1)//2+1))
@@ -106,7 +108,7 @@ class Solution:
         
         return False
 
-print(Solution().containsNearbyAlmostDuplicate([1,2,3,1], 3, 0))
+# print(Solution().containsNearbyAlmostDuplicate([1,2,3,1], 3, 0))
 
 
 # 并查集
@@ -159,9 +161,9 @@ def dfs(l, r, h):
     memory[(l, r)] = ans
     return ans
 
-for i in range(n):
-    i = 16
-    print(i, dfs(i,i, num[i]))
+# for i in range(n):
+#     i = 16
+#     print(i, dfs(i,i, num[i]))
 
 
 # 素数删表法

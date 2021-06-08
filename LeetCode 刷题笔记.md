@@ -46,6 +46,7 @@
 ```
 
 1. 异或运算 可以 用于找出字符串中出现奇数次的那唯一一个单词. 可以用于处理==判别回文序列==
+2. 可以找寻系列中唯一一个只出现奇数次的数字【字符ascii码同样适用】
 
 #### 逻辑与 &
 
@@ -516,3 +517,22 @@ def prime_table(n):
 
 3. 树状数组
 
+    [1409. 查询带键的排列 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/queries-on-a-permutation-with-key/submissions/)
+    
+    [统计作战单位数 - 统计作战单位数 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/count-number-of-teams/solution/tong-ji-zuo-zhan-dan-wei-shu-by-leetcode-solution/)
+
+4. 原地顺时针旋转矩阵
+
+    解法： step1: 水平翻转上下行，
+
+    ​			step2: 根据主对角线进行翻转
+
+    ​			主要就是完成了 $matrix[col][n-1-row] = matrix[row][col]$的原地交换算法
+
+5. 股票购买问题
+
+    $dp[i][j]$ 表示的是 在第 i 天 手上股票的状态为 j 的情况下，能获得的最大利益。 
+
+    ​		j=1: 表示 手上 持有股票
+
+    ​		j = 0: 表示手上未持有股票
