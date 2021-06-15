@@ -14,8 +14,9 @@ class Solution:
                     count += (i-prev-1) // k
                     prev = i
 
+            # 最后一部分叶修要考虑
             count += (n-prev-1) // k
-            print(l ,r, mid, count)
+            # print(l ,r, mid, count)
             if count < m: l = mid + 1
             else: r = mid - 1
         

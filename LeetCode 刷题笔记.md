@@ -39,6 +39,8 @@
 15. 去重 不要 只想着 使用数据结构 集合 来进行， 有许多都是可以在算法层面进行去重的。
 
      [90. 子集 II - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/subsets-ii/submissions/)
+    
+16. 能通过迭代运算获得的就应该优先使用迭代算法，而不应该是使用递归算法，递归的开销一般比迭代大的多。
 
 ## 位运算
 
@@ -248,7 +250,6 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
             return list(dfs(root1)) == list(dfs(root2))
     ```
     
-
 2. `汉诺塔问题`的 递归函数状态 设计的十分巧妙！！！
 
     ```python
@@ -548,7 +549,7 @@ def prime_table(n):
 3. 树状数组
 
     [1409. 查询带键的排列 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/queries-on-a-permutation-with-key/submissions/)
-    
+
     [统计作战单位数 - 统计作战单位数 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/count-number-of-teams/solution/tong-ji-zuo-zhan-dan-wei-shu-by-leetcode-solution/)
 
 4. 原地顺时针旋转矩阵
@@ -571,12 +572,39 @@ def prime_table(n):
 
     ==摩尔投票法==
 
-    #### [面试题 17.10. 主要元素](https://leetcode-cn.com/problems/find-majority-element-lcci/)
+    [面试题 17.10. 主要元素](https://leetcode-cn.com/problems/find-majority-element-lcci/)
 
     ```python
     每次从序列里选择两个不相同的数字删除掉（或称为“抵消”），最后剩下一个数字或几个相同的数字，就是出现次数大于总数一半的那个。
     ```
 
-    
+7. 滑动窗口
 
-    
+    1. 滑动窗口在进行迭代之前的时候，需要利用数组前 size 个元素先构建一个滑动窗口。在迭代的时候只要弹出最早进入滑窗的元素，然后令下一个元素进入滑窗的逻辑即可。
+
+        ```python
+        # 解法 2： 滑动窗口 
+            def maxSatisfied(self, customers, grumpy, minutes: int) -> int:
+                total = sum(i*(1-j) for i,j in zip(customers, grumpy)) # 原本就满意的人数
+                windows = sum(i*j for i,j in zip(customers[:minutes], grumpy[:minutes])) # 窗口状态， 窗口大小为 minutes
+        
+                ans = windows
+                for i in range(minutes, len(customers)):
+                    windows += customers[i]*grumpy[i] - customers[i-minutes]*grumpy[i-minutes]
+                    ans = max(ans, windows)
+                
+                return ans + total
+        ```
+
+        
+
+    2. 
+
+## 动态规划
+
+1. 一般`子序列问题`， 大多都是需要动态规划思想来解决
+    1. 最长递增子序列问题
+    2. 最长公共子序列问题
+
+2. 思维不要局限在 动态规划 只能基于数组的思维方式，也是可以基于字典等其它复杂结构。
+
