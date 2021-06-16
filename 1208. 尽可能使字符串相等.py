@@ -19,7 +19,7 @@ class Solution:
             else: 
                 window -= cost[l]
                 l += 1
-                # ans = max(ans, int(tmp <= maxCost))
+    
         return ans
 
 

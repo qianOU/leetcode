@@ -409,6 +409,10 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
 
 eg: [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-sorted-matrix/)
 
+### 3. 二分查找不一定应用在有序数组中，由于某些局部特性，也可以使用二分查找
+
+[162. 寻找峰值 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/find-peak-element/) 
+
 
 
 ## 滑动窗口
@@ -442,7 +446,9 @@ eg: [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kt
 
     
 
-3. 
+3. 滑动窗口中的最 大/小 值等问题，推荐可以使用 ==单调队列==结构来实现，或者是使用窗口有序集合来实现。
+
+
 
 ## 并查集
 
@@ -596,9 +602,15 @@ def prime_table(n):
                 return ans + total
         ```
 
-        
+8. 子数组问题
 
-    2. 
+    主要解法
+
+    1. 动态规划
+
+    2. 滑动窗口
+
+        
 
 ## 动态规划
 
