@@ -22,7 +22,7 @@
     * 主对角线： $j - i = k$
     * 副对角线： $j + i = k$
     
-10. Python的整数除法是向`-∞`取整的
+10. Python的整数除法是向`-∞`取整的，诸如 C语言等都是向 0 取整的
 
 11. `坑`：
     
@@ -607,10 +607,13 @@ def prime_table(n):
     主要解法
 
     1. 动态规划
+2. 滑动窗口
+    
+9. 与target最接近的数组元素和
 
-    2. 滑动窗口
+    [最接近的三数之和 - 最接近的三数之和 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/3sum-closest/solution/zui-jie-jin-de-san-shu-zhi-he-by-leetcode-solution/)
 
-        
+    使用的方法是：==排序 + 双指针==， 双指针有点类似 接雨水 问题。充分利用有序的特性。
 
 ## 动态规划
 
@@ -620,3 +623,20 @@ def prime_table(n):
 
 2. 思维不要局限在 动态规划 只能基于数组的思维方式，也是可以基于字典等其它复杂结构。
 
+
+
+## 数论
+
+1. 整除相关：
+
+    * ==同余定理==
+
+        **如果两个整数 a, b 满足 (a-b)%K == 0，那么有 a%K == b%K。**
+
+    * ==费马小定理==
+
+        假如p是质数，且a 与 p 互质，即 gcd(a,p)=1，那么a(p−1)≡1(mod p)。
+
+        
+
+    
