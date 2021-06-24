@@ -580,6 +580,8 @@ def prime_table(n):
 
     [面试题 17.10. 主要元素](https://leetcode-cn.com/problems/find-majority-element-lcci/)
 
+    [229. 求众数 II - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/majority-element-ii/submissions/)
+
     ```python
     每次从序列里选择两个不相同的数字删除掉（或称为“抵消”），最后剩下一个数字或几个相同的数字，就是出现次数大于总数一半的那个。
     ```
@@ -607,13 +609,16 @@ def prime_table(n):
     主要解法
 
     1. 动态规划
-2. 滑动窗口
     
+2. 滑动窗口
+   
 9. 与target最接近的数组元素和
 
     [最接近的三数之和 - 最接近的三数之和 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/3sum-closest/solution/zui-jie-jin-de-san-shu-zhi-he-by-leetcode-solution/)
 
     使用的方法是：==排序 + 双指针==， 双指针有点类似 接雨水 问题。充分利用有序的特性。
+    
+11. 前缀和 + 前缀和计数表
 
 ## 动态规划
 
