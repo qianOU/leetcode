@@ -40,7 +40,11 @@
 
      [90. 子集 II - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/subsets-ii/submissions/)
     
+    [47. 全排列 II - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/permutations-ii/)
+    
 16. 能通过迭代运算获得的就应该优先使用迭代算法，而不应该是使用递归算法，递归的开销一般比迭代大的多。
+
+17. 与循环相关的算法，一定要注意看看是否可以实现剪枝，剪枝可以极大提高效率。[18. 四数之和 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/4sum/)
 
 ## 位运算
 
@@ -54,8 +58,16 @@
 ```
 
 1. 异或运算 可以 用于找出字符串中出现奇数次的那唯一一个单词. 可以用于处理==判别回文序列==
+
 2. 可以找寻系列中唯一一个只出现奇数次的数字【字符ascii码同样适用】
+
 3. 位运算 是优先级 `最低`的运算符
+
+4. 二进制  源码，反码，补码：[这样给小白讲原码、反码、补码，帮她彻底解决困扰了三天的问题 - bigsai - 博客园 (cnblogs.com)](https://www.cnblogs.com/bigsai/p/14930883.html)
+
+5. python 二进制 不区分 有符号 与 无符号，统一是按无符号处理。
+
+    因为「有符号整数类型」（即 int 类型）的第 31 个二进制位（即最高位）是补码意义下的符号位，对应着 $-2^{31}$，而「无符号整数类型」由于没有符号，第 31个二进制位对应着 $2^{31}$ 。
 
 #### 逻辑与 &
 
@@ -618,7 +630,9 @@ def prime_table(n):
 
     使用的方法是：==排序 + 双指针==， 双指针有点类似 接雨水 问题。充分利用有序的特性。
     
-11. 前缀和 + 前缀和计数表
+11. 前缀和 [presum[0] = 0]+ 前缀和计数表[presum = {0: 1} ]
+
+     [560. 和为K的子数组 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/subarray-sum-equals-k/)
 
 ## 动态规划
 

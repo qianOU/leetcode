@@ -1,6 +1,7 @@
 class Solution:
     # 三数和的变种
     # 实际上，还可以加入一些剪枝操作！！！减少运行时间
+    # 剪枝操作十分重要！！！！
     def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
         ans = []
         nums.sort()
