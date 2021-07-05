@@ -54,7 +54,8 @@ class Solution:
                     # 如果 nums[i] == nums[i-1] ，并且 i-1 未被遍历过，则是重复状态
                     if i > 0 and nums[i-1] == nums[i] and not vis[i-1]:
                         continue
-                
+
+                    # 如果 i 还没被遍历过
                     if not vis[i]:
                         # 做选择
                         path.append(nums[i])
@@ -69,5 +70,3 @@ class Solution:
             backtrace(0, [])
 
             return ans
-
-print(Solution().permuteUnique([3,3,0,3]))

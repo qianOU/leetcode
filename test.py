@@ -182,3 +182,111 @@ def prime_table(n):
     
     # 返回素数的个数
     return sum(ans[2:])
+
+# 背包问题
+def solver(n, w, wt, val):
+    # dp[i][j] 表示的是 背包容量为 j 的时候，面对 前 i 件物品能获得的最大价值
+    dp = [[0]*(w+1) for i in range(n+1)] 
+    # base - case
+    dp[0][0] = 0 
+
+    for i in range(1, n+1):
+        for j in range(1, w+1):
+            if j >= wt[i-1]:
+                dp[i][j] = max(dp[i-1][j], dp[i-1][j - wt[i-1]] + val[i-1]) # 选 i ，不选 i
+            else:
+                dp[i][j] = dp[i-1][j]
+    
+    return dp[n][w]
+
+# 字典树
+# 用于字符串匹配
+from collections import defaultdict
+class TrieNode:
+    def __init__(self):
+        self.chiledren = defaultdict(self.__class__)
+        self.ending = False # 表示是否是以该 node 为结尾的单词
+
+class Trie:
+    def __init__(self, nums):
+        self.root = TrieNode() # 字典树的根节点，只是作为入口
+        
+    # 将 单词 按招前缀 插入 前缀树中
+    def insert(self, word:str):
+        cur = self.root
+        for w in word:
+            cur = cur.chiledren[w]
+    
+    # 搜寻， 前缀树中 是否 存在 与 word 匹配的单词
+    def search(self, word):
+        cur = self.root
+        flag = True
+        for w in word:
+            if w not in cur.chiledren:
+                flag = False
+                break
+            cur = cur.chiledren[w]
+        
+        return flag and cur.ending
+    
+    # 搜寻：前缀树中是否 存在 prefix 
+    def search(self, prefix):
+        cur = self.root
+        flag = True
+        for w in prefix:
+            if w not in cur.chiledren:
+                flag = False
+                break
+            cur = cur.chiledren[w]
+        
+        return flag
+
+## 线段树
+# 基于满二叉树的数组实现形式
+# 原数组作为叶子节点
+# 以求区间和为例子
+class NumTree:
+    def __init__(self, nums):
+        self.n = n = len(nums)
+        self.tree = [0]*2*n
+
+        # 放入 树状数组中
+        for i in range(n, 2*n):
+            self.tree[i] = nums[i-n]
+        
+        for i in range(n-1, 0, -1):
+            self.tree[i] = self.tree[2*i] + self.tree[2*i+1] # 左右子节点的和，形成父节点
+        
+    
+    # 更新原数组 index 的值为 val, 以及其父节点
+    def update(self, index, val):
+        pos = self.n + index
+        self.tree[pos] = val
+        
+        while pos > 0:
+            l = r = pos
+            if pos % 2: #如果 pos 是 右子节点
+                l = pos - 1
+            else: # 如果 pos 是左子节点
+                r = pos + 1 
+            
+            pos //= 2 # 父节点
+            self.tree[pos] = self.tree[l] + self.tree[r]
+
+
+    def sumrange(self, left, right):
+        l = self.n + left
+        r = self.n + right
+        ans = 0
+        while l < r:
+            if l % 2:
+                ans += self.tree[l]
+                l += 1
+            if r % 2 == 0:
+                ans += self.tree[r]
+                r -= 1
+        
+        if l == r:
+            ans += self.tree[l]
+        
+        return ans

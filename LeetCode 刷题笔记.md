@@ -46,6 +46,8 @@
 
 17. 与循环相关的算法，一定要注意看看是否可以实现剪枝，剪枝可以极大提高效率。[18. 四数之和 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/4sum/)
 
+18. ==丑数==： 定义就是 可以因式分解为 制定质因子的乘积的数，1 是丑数的初始值。  
+
 ## 位运算
 
 #### 异或运算
@@ -55,6 +57,7 @@
 2.任何数与0异或为任何数 0 ^ n => n
 3.相同的数异或为0: n ^ n => 0
 4 4i⊕(4i+1)⊕(4i+2)⊕(4i+3)=0 # 异或的性质 1^2^3 = 0
+5. c = a ^ b 则有 a = c ^ b 
 ```
 
 1. 异或运算 可以 用于找出字符串中出现奇数次的那唯一一个单词. 可以用于处理==判别回文序列==
@@ -113,7 +116,7 @@
 
 1. 如果对 `空节点用特殊符号进行标记`的话，则单靠前序，后序都可以进行反序列化还原树，而==单靠中序遍历不能完成==
 
-2. 如果`没有`对 空节点进行特殊标记，则需要两种遍历方式搭配使用，即 前+中，后+中，但是 前+中 不可以。
+2. 如果`没有`对 空节点进行特殊标记，则需要两种遍历方式搭配使用，即 前+中，后+中，但是 前+后 不可以。
 
 3. 如果是二叉搜索树的话，可以使用前 or 后序遍历，再搭配二分查找完成反序列化。或者 二叉树可以通过前序序列或后序序列和中序序列构造（即与2相同）。
 
@@ -207,6 +210,62 @@ class Solution:
 采用前序遍历的方式，实现dfs逻辑即可
 
 ==注意：== 树的题目，使用DFS解法时，一定要注意迭代方式 
+
+### 字典树
+
+字典树 又 称为前缀树，是特殊的n叉树解构，需要一个根节点来驱动。
+
+[数组中两个数的最大异或值 - 数组中两个数的最大异或值 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/maximum-xor-of-two-numbers-in-an-array/solution/shu-zu-zhong-liang-ge-shu-de-zui-da-yi-h-n9m9/)
+
+[208. 实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree/)
+
+```python
+# 模板
+
+# 字典树的节点类
+class TrieNode:
+    def __init__(self):
+        self.children = defaultdict(TrieNode)
+        
+# 字典树类，实现了插入，与搜索方法
+class Trie:
+    def __init__(self, nums):
+        self.root = TrieNode() # 根节点
+        for n in nums:
+            self.insert(n)
+    
+    def insert(self, n): # 从右向左每一位插入Trie
+        cur = self.root
+        for i in range(31, -1, -1):
+            cur = cur.children[(n>>i) & 1] # 创建每一个字节点，并且移动指针到子节点上
+    
+    def searchMax(self, n):
+        res, cur = 0, self.root
+        for i in range(31, -1, -1):           # 从右向左找最多xor=1的儿子
+            bit = (n>>i) & 1
+            if bit ^ 1 in cur.children:        # 找到就向儿子走（第i位的二进制可以满足异或结果为 1）
+                cur = cur.children[bit ^ 1]
+                res += (1<<i)
+            else:                  # 没找到就向bit走，因为有可能之后会找到xor=1的儿子
+                cur = cur.children[bit]
+        return res
+
+    
+
+class Solution:
+    def findMaximumXOR(self, nums: List[int]) -> int:
+        t = Trie(nums)
+        return max([t.searchMax(n) for n in nums])
+```
+
+### 线段树
+
+**算法：**==满二叉树==
+线段树是一种非常灵活的数据结构，它可以用于解决多种范围查询问题，比如在对数时间内从数组中找到最小值、最大值、总和、最大公约数、最小公倍数等。
+
+[区域和检索 - 数组可修改 - 区域和检索 - 数组可修改 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/range-sum-query-mutable/solution/qu-yu-he-jian-suo-shu-zu-ke-xiu-gai-by-leetcode/)
+
+
 
 ### 并查集
 
@@ -639,7 +698,8 @@ def prime_table(n):
 1. 一般`子序列问题`， 大多都是需要动态规划思想来解决
     1. 最长递增子序列问题
     2. 最长公共子序列问题
-
+3. 最大整除数组（与1类似，但是需要给出具体的最大集合，值得学习）[【宫水三叶の相信科学系列】详解为何能转换为序列 DP 问题 - 最大整除子集 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/largest-divisible-subset/solution/gong-shui-san-xie-noxiang-xin-ke-xue-xi-0a3jc/)
+    
 2. 思维不要局限在 动态规划 只能基于数组的思维方式，也是可以基于字典等其它复杂结构。
 
 
@@ -656,6 +716,9 @@ def prime_table(n):
 
         假如p是质数，且a 与 p 互质，即 gcd(a,p)=1，那么a(p−1)≡1(mod p)。
 
-        
 
-    
+##  Fisher-Yates 洗牌算法 （公平的随机排列）
+
+**算法**
+
+Fisher-Yates 洗牌算法跟暴力算法很像。在每次迭代中，生成一个范围在当前下标到数组末尾元素下标之间的随机整数。接下来，将当前元素和随机选出的下标所指的元素互相交换 - 这一步模拟了每次从 “帽子” 里面摸一个元素的过程，其中选取下标范围的依据在于每个被摸出的元素都不可能再被摸出来了。此外还有一个需要注意的细节，当前元素是可以和它本身互相交换的 - 否则生成最后的排列组合的概率就不对了。[打乱数组 - 打乱数组 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/shuffle-an-array/solution/da-luan-shu-zu-by-leetcode/)
