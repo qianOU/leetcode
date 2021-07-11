@@ -48,6 +48,8 @@
 
 18. ==丑数==： 定义就是 可以因式分解为 制定质因子的乘积的数，1 是丑数的初始值。  
 
+19. 对数时间的复杂度 一般 需要 联系到 二分的思路。
+
 ## 位运算
 
 #### 异或运算
@@ -71,6 +73,19 @@
 5. python 二进制 不区分 有符号 与 无符号，统一是按无符号处理。
 
     因为「有符号整数类型」（即 int 类型）的第 31 个二进制位（即最高位）是补码意义下的符号位，对应着 $-2^{31}$，而「无符号整数类型」由于没有符号，第 31个二进制位对应着 $2^{31}$ 。
+    
+6. lowbit 算法，也就是找寻二进制的最低位为 1的 位置进行处理。
+
+7. 直接将 `n` 二进制表示的最低位 1 移除 :  ==n&(n-1)== ,得到 最低位 之前的高位数值
+
+8. 直接获取 `n` 二进制表示的最低位的 1 的数值。 ==n&(-n)==,，利用了负数是正数的补码，即反码 + 1
+
+9. 由 6，  7 推导出，判断数字 n 是否是 2 的幂有以下两个方法：
+
+    1. $n\&(n-1) == 0$
+    2. $n\&(-n) == n$
+    
+10. 判别两个数的符号是否相通，可以通过==二进制中 的符号位是否为1来判断==， 正数的符号位为 0 ，负数的符号位为 1， 这就说明 正数 和 负数 进行异或的话，符号位还是为 1，也就是结果还是负数。
 
 #### 逻辑与 &
 
@@ -291,18 +306,6 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
 
 
 
-## 类型
-
-### 动态规划
-
-1. 判断子序列 s 是否存在于 t 中
-
-     dp\[i\]\[j\] 表示字符串 *t* 中从位置 i 开始往后直到字符 j 第一次出现的位置
-
-    base-case: dp\[len(t)\][*] = m 表示不存在
-
-
-
 
 ## DFS
 
@@ -402,7 +405,14 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
 
         
 
-    
+
+### 常见题型
+
+1. 计算器的 数字 表达实现 题
+
+    1. 处理子问题的时候，以 `"(“`作为处理子问题的递归入口标识，对于 `”)“`作为递归的出口标识。
+
+        [726. 原子的数量 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/number-of-atoms/)【任何带有括号的字符串解析，都是利用递归来处理】
 
 ## 链表
 
@@ -530,8 +540,12 @@ eg: [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kt
 3. 交换元素问题【1722】
 
     比如 [1, 2], [0,1]  则意味着 0，1，2可以任意交换位置，其实质也就是同一个连通量
+    
+4. 一边查询一边修改结点指向是并查集的特色
 
+5. `带权值`的并查集(有参考意义) 
 
+     [399. 除法求值 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/evaluate-division/)
 
 ## 图
 
@@ -560,6 +574,84 @@ eg: [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kt
     * 在寻求最少花费的时候，一个节点可能会被遍历多次，为了避免一个节点的无线重复遍历，这时候的入队列的条件可以设置为 ==使得从起点到达该点的费用变少的时候，才入队列==
 
 ## 整数相关
+
+### 不使用乘法运算，来实现乘法 / 快速乘法 / 倍增乘法
+
+```python
+# 快速乘法模板
+def mul(a, b):
+    ans = 0
+    # 使用的二进制位运算来实现乘法
+    while b:
+        if b & 1:
+            ans += a
+        a <<= 1 # 每次叠加 2 倍
+        b >>= 1
+
+    return ans
+```
+
+
+
+### 快速幂运算
+
+1. 递归思路，空间消耗  0(logN)
+
+思路：使用递归，每次将问题规模缩小一半，时复是O(logN)
+
+递推关系式：
+$$
+a^b=\left\{
+\begin{aligned}
+ & a*a^{b-1}   & b为奇数 \\
+& (a^{\frac{b}2})^{2} & b为偶数\\
+
+\end{aligned}
+\right.
+$$
+代码：
+
+```python
+    # 优雅的递归写法
+    # 只考虑正数,负数次幂就是 取倒数的关系
+    def myPow( x: float, n: int) -> float:
+        def quickPow(x, n):
+            if n == 0: return 1
+
+            if n & 1: # 奇数情况
+                return x * quickPow(x, n-1)
+            else: # 偶数情况
+                return  quickPow(x, n // 2) ** 2
+
+        return quickPow(x, n) if n >= 0 else 1 / quickPow(x, -n)
+```
+
+2. 迭代思路
+
+求 x 的 n 次方， 主要思路就是：
+
+ 将 n 用 2 进制表示，对于  2进制中1 i 位为 1 的 其对最后结果的贡献是 x**(2\*\*i)，
+
+代码：
+
+```python
+    # 只考虑正数,负数次幂就是 取倒数的关系
+    def myPow( x: float, n: int) -> float:
+        def quickPow(x, n):
+            res = 1
+            while n:
+                if n & 1：
+                	res *= x
+                x *= x # 每次 x 翻一番
+                n >>= 1
+           return res
+
+            return quickPow(x, n) if n >= 0 else 1 / quickPow(x, -n)
+```
+
+
+
+参考资料：[50. Pow(x, n) - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/powx-n/)
 
 ### 1. 获得某一个整数各个位数上的值
 
@@ -693,14 +785,139 @@ def prime_table(n):
 
      [560. 和为K的子数组 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/subarray-sum-equals-k/)
 
+12. 顺时针旋转矩阵 90 度
+    1. step1： 水平上下翻转
+    2. step2：主对角线翻转
+
 ## 动态规划
+
+### 知识点
+
+==动态规划，最重要的点就是`子问题的独立性`，只要能剥离出独立的子问题都可以使用动态规划来完成==
+
+### 一维DP
 
 1. 一般`子序列问题`， 大多都是需要动态规划思想来解决
     1. 最长递增子序列问题
-    2. 最长公共子序列问题
-3. 最大整除数组（与1类似，但是需要给出具体的最大集合，值得学习）[【宫水三叶の相信科学系列】详解为何能转换为序列 DP 问题 - 最大整除子集 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/largest-divisible-subset/solution/gong-shui-san-xie-noxiang-xin-ke-xue-xi-0a3jc/)
+2. 最大整除数组（与1类似，但是需要给出具体的最大集合，值得学习）[【宫水三叶の相信科学系列】详解为何能转换为序列 DP 问题 - 最大整除子集 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/largest-divisible-subset/solution/gong-shui-san-xie-noxiang-xin-ke-xue-xi-0a3jc/)
+3. 思维不要局限在 动态规划 只能基于数组的思维方式，也是可以基于字典等其它复杂结构。
+
+### 二维DP
+
+1. 背包问题 / 组合问题 / 完全背包问题
+
+    1. 不考虑顺序 背包问题
+
+        $dp[i][j]$ 表示的是 使用前 i 个物品，在背包容量为 j 的时候 能获得 的 最大 价值 $dp[i][j]$
+
+        做选择的时候，第 i 件物品有两种可能，加入背包或者 不加入背包（在这两种状态中选择最优的即可）。
+
+    0-1背包问题：[416. 分割等和子集 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/partition-equal-subset-sum/)
+
+    完全背包问题：[518. 零钱兑换 II - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/coin-change-2/)
+
+    2. 考虑顺序 组合问题---> 排列问题
+
+        [组合总和 Ⅳ - 组合总和 Ⅳ - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/combination-sum-iv/solution/zu-he-zong-he-iv-by-leetcode-solution-q8zv/)
+
+2. 最长回文子串
+
+    属于单序列2维DP问题
+
+    [486. 预测赢家 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/predict-the-winner/submissions/)
     
-2. 思维不要局限在 动态规划 只能基于数组的思维方式，也是可以基于字典等其它复杂结构。
+    [5. 最长回文子串 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/longest-palindromic-substring/)
+    
+3. 最长公共子序列问题
+
+    $dp[i][j]$ 表示的是 str1[ 0 : i ] 和 str2[  0 :  j ] 构成的最大公共子序列长度
+
+4. 判断子序列 s 是否存在于 t 中
+
+    dp\[i\]\[j\] 表示字符串 *t* 中从位置 i 开始往后直到字符 j 第一次出现的位置
+
+    base-case: dp\[len(t)\][*] = m 表示不存在
+
+
+
+## 字符串
+
+### KMP算法
+
+1. PMT 数组：**PMT中的值是字符串的前缀集合与后缀集合的交集中最长元素的长度**
+
+2. 字符串前缀 与 字符串后缀集合概念
+
+    例如，”Harry”的前缀包括{”H”, ”Ha”, ”Har”, ”Harr”}
+
+    例如，”Potter”的后缀包括{”otter”, ”tter”, ”ter”, ”er”, ”r”}
+
+    要注意的是，字符串本身并不是自己的后缀或者前缀
+
+3. next数组： 将PMT数组向后偏移一位。在把PMT进行向右偏移时，第0位的值，我们将其设成了-1，这只是为了编程的方便。
+
+4. KMP算法高效的一个原因是==永远不回退 主字符串指针==。
+
+    ![image-20210710232917307](D:\桌面\学习记录\markdwon笔记图片保存内容\image-20210710232917307.png)
+
+5. 接口形式 【需要注意 i,j 初始化的值】
+
+```python
+def KMP(main, patten):
+            m, n = len(main), len(patten)
+            if not n: return 0
+            next = getNext(patten) # next 数组
+            i, j = 0, 0 
+
+            while i < m and j < n:
+                if j == -1 or main[i] == patten[j]:
+                    i += 1
+                    j += 1
+                else: # 回退模式串指针
+                    j = next[j]
+            
+            # 匹配的字符串区间是[i-j, i-1]
+            if j == n: 
+                return i - j
+            
+            return -1
+
+```
+
+5. 高效 求解 next 数组 【需要注意 i, j 初始化的值】
+
+    求next数组的过程完全可以看成==字符串匹配==的过程，即以模式字符串为`主字符串`（以 nums[i]为结尾的后缀），==以模式字符串的前缀为`目标字符串`==（以nums[j] 为前缀结尾的前缀），一旦字符串匹配成功，那么当前的next值就是匹配成功的字符串的长度。
+
+    注意：next 默认有下面情况成立：next[0] = -1, next[1] = PMT[0] = 0
+
+    所以在更新 next 的时候，直接 主字符串的 i 索引从 1 开始更新，对应的next从 i+1 处更新，因为 next 是 PMT 右移一位的结果。`为何从1开始是因为，字符串要存在后缀集合起码需要 2 个元素。`
+
+    ```python
+    def getNext(patten):
+        n = len(patten)
+        next = [-1] * n
+        # base case
+        next[0] = -1
+        # next[1] = 0 # 则是循环触发的第一步
+        # i与j初始相差1，是因为祝字符串表示的是后缀，目标字符串表示的是前缀，他们之间起码差 1
+        i, j = 0, -1 # 主字符串的指针i, 模式字符串的指针 j
+    
+        while i < n - 1:
+            # 以nums[i] 为结尾的 子串的 PMT值
+            if j == -1 or patten[i] == patten[j]:
+                i += 1
+                j += 1
+                next[i] = j
+    
+            else: # 不匹配的话.回退模式串的指针
+                j = next[j]
+    
+        return next
+    ```
+
+    
+
+参考资料：[如何更好地理解和掌握 KMP 算法? - 知乎 (zhihu.com)](https://www.zhihu.com/question/21923021/answer/281346746?utm_source=wechat_session&utm_medium=social&utm_oi=860880601484521472)
 
 
 
@@ -712,12 +929,18 @@ def prime_table(n):
 
         **如果两个整数 a, b 满足 (a-b)%K == 0，那么有 a%K == b%K。**
 
-    * ==费马小定理==
+    * 求余的分配定律
 
+        $(a*b)\ \%\ k = (a\ \%\ k)\ (b\ \%\ k)\ \% \ k$
+    
+    * ==费马小定理==
+    
         假如p是质数，且a 与 p 互质，即 gcd(a,p)=1，那么a(p−1)≡1(mod p)。
 
 
-##  Fisher-Yates 洗牌算法 （公平的随机排列）
+##  随机化算法
+
+1. Fisher-Yates 洗牌算法 （公平的随机排列）
 
 **算法**
 

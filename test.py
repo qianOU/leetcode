@@ -290,3 +290,19 @@ class NumTree:
             ans += self.tree[l]
         
         return ans
+
+
+# 快速乘法模板
+def mul(a, b):
+    ans = 0
+    # 使用的二进制位运算来实现乘法
+    while b:
+        if b & 1:
+            ans += a
+        a <<= 1
+        b >>= 1
+        print(a, b)
+
+    return ans
+
+mul(-3, -1)
