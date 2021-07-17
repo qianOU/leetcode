@@ -24,7 +24,7 @@ class Solution:
         return False
 
 class Solution:
-    # 二分， 需要考虑 mid 落在区间的 左部分还是右部分
+    # 二分， 需要考虑 mid 落在区间的 左部分【l， mid】还是右部分[mid+1, r] 
     def search(self, nums, target: int) -> bool:
         import time
         l, r = 0, len(nums) # 左闭右开区间

@@ -43,3 +43,12 @@ class Solution(object):
             p2 = p2.next
         
         return p1
+
+    # 优美的写法
+    def getIntersectionNode(self, headA, headB):
+        p1, p2 = headA, headB
+        # 如果有交点两个指针则会在  m + n 步之内相交，如果没有交点则在 m+n步之后，p1，p2 都指向了 None
+        while p1 != p2: 
+            p1 = headB if p1 is None else p1.next # p1 走完，转到 链表2 前进
+            p2 = headA if p2 is None else p2.next  # p2 走完，转到 链表1 前进
+        return p1 
