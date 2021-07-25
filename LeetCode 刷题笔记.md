@@ -32,7 +32,7 @@
 
 13. 计算任何日期是属于星期几：==蔡勒公式==[蔡勒公式_百度百科 (baidu.com)](https://baike.baidu.com/item/蔡勒公式)
 
-14. Python 中， a, b = c, d 操作的原理是先暂存元组 (c, d)，然后 “按左右顺序” 赋值给 a 和 b 。
+14. Python 中， a, b = c, d 操作的原理是先暂存元组 (c, d)，然后==按左右顺序==赋值给 a 和 b 。
 
       
     
@@ -53,6 +53,8 @@
 20. 优先级顺序
 
      ![这里写图片描述](D:\桌面\学习记录\markdwon笔记图片保存内容\70)
+    
+21. Python 里面 形式 a = b = 3，的赋值过程是先将 3 赋值给 a， 其后将 3 赋值给 b。 这与 JavaScript 存在不同。在赋值给引用变量的时候特别重要。eg : `prev.next = prev = node`
 
 ## 位运算
 
@@ -64,34 +66,72 @@
 3.相同的数异或为0: n ^ n => 0
 4 4i⊕(4i+1)⊕(4i+2)⊕(4i+3)=0 # 异或的性质 1^2^3 = 0
 5. c = a ^ b 则有 a = c ^ b 
+6. 对数字的取反也可以使用异或来完成，和指定位数全为 1 的数字进行异或
+	res ^ 0xffffffff 表示的就是对 res 后32位取反
 ```
 
 1. 异或运算 可以 用于找出字符串中出现奇数次的那唯一一个单词. 可以用于处理==判别回文序列==
 
-2. 可以找寻系列中唯一一个只出现奇数次的数字【字符ascii码同样适用】
+2. ==判别两个数字是否是正负不同号的技巧==
 
-3. 位运算 是优先级 `最低`的运算符
+    ```python
+    a ^ b < 0  说明a,b 异号 （最高位符号位不同导致的）
+    a ^ b >= 0 说明a,b 同号
+    ```
 
-4. 二进制  源码，反码，补码：[这样给小白讲原码、反码、补码，帮她彻底解决困扰了三天的问题 - bigsai - 博客园 (cnblogs.com)](https://www.cnblogs.com/bigsai/p/14930883.html)
+    
 
-5. python 二进制 不区分 有符号 与 无符号，统一是按无符号处理。
+3. 可以找寻系列中唯一一个只出现奇数次的数字【字符ascii码同样适用】
+
+4. 位运算 是优先级 `最低`的运算符
+
+5. 二进制  源码，反码，补码：[这样给小白讲原码、反码、补码，帮她彻底解决困扰了三天的问题 - bigsai - 博客园 (cnblogs.com)](https://www.cnblogs.com/bigsai/p/14930883.html)
+
+6. python 二进制 不区分 有符号 与 无符号，统一是按无符号处理。
 
     因为「有符号整数类型」（即 int 类型）的第 31 个二进制位（即最高位）是补码意义下的符号位，对应着 $-2^{31}$，而「无符号整数类型」由于没有符号，第 31个二进制位对应着 $2^{31}$ 。所以，对于某些题目，需要对 31 位进行特俗处理，即将python 中的 第 31 位对应的 $2^{31}$ 转换位$-2^{31}$。
+
+7. Python中无具体位数概念，其是无限位的，即负数的符号位是无限个前导1，同理正数也是无数个前导0。在进行模拟位运算的时候，通常截取出后32位进行模拟，最后依据数至是否超过$2^{31}-1$来判断是否是负数，如果是负数需要将后32位取反，最后再对整个结果取反。
+
+    ```python
+    将32位的负数补码，返回成python 可以识别的形式 ~ (res ^ 0xffffffff)
+    res ^ 0xffffffff 表示的是对 res 的后 32 位进行取反
+    ```
+
+    [剑指 Offer 65. 不用加减乘除做加法 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/bu-yong-jia-jian-cheng-chu-zuo-jia-fa-lcof/)
+
+    ```python
+    # 使用位运算进行模拟加法过程，同时处理含有负数的情况
+    class Solution:
+        # 位运算 异或 与 或运算
+        def add(self, a: int, b: int) -> int:
+            x = 0xffffffff
+            a, b = a & x, b & x
+            while b != 0:
+                # a ^ b 表示的是无进位的加法， (a & b) << 1 表示的是进位
+                a, b = a ^ b, ((a & b) << 1) & x  # b 的更新一定要 和 x 进行与运算
+            
+            return a if a < 0x80000000 else ~(a ^ x)
+    ```
+
     
-6. lowbit 算法，也就是找寻二进制的最低位为 1的 位置进行处理。
 
-7. 直接将 `n` 二进制表示的最低位 1 移除 :  ==n&(n-1)== ,得到 最低位 之前的高位数值
+8. lowbit 算法，也就是找寻二进制的最低位为 1的 位置进行处理。
 
-8. 直接获取 `n` 二进制表示的最低位的 1 的数值。 ==n&(-n)==,，利用了负数是正数的补码，即反码 + 1
+9. 直接将 `n` 二进制表示的最低位 1 移除 :  ==n&(n-1)== ,得到 最低位 之前的高位数值
 
-9. 由 6，  7 推导出，判断数字 n 是否是 2 的幂有以下两个方法：
+10. 直接获取 `n` 二进制表示的最低位的 1 的数值。 ==n&(-n)==,，利用了负数是正数的补码，即反码 + 1
 
-    1. $n\&(n-1) == 0$
-    2. $n\&(-n) == n$
-    3. $x \& (x−1)$ 可以将 x 的二进制表示中的最低位的 1 置成 0。
-    4. $x\&(-x)$可以将 x 的最低位为1的数字表示出来
-    
-10. 判别两个数的符号是否相通，可以通过==二进制中 的符号位是否为1来判断==， 正数的符号位为 0 ，负数的符号位为 1， 这就说明 正数 和 负数 进行异或的话，符号位还是为 1，也就是结果还是负数。
+11. 由 6，  7 推导出，判断数字 n 是否是 2 的幂有以下两个方法：
+
+     1. $n\&(n-1) == 0$
+     2. $n\&(-n) == n$
+     3. $x \& (x−1)$ 可以将 x 的二进制表示中的最低位的 1 置成 0。
+     4. $x\&(-x)$可以将 x 的最低位为1的数字表示出来
+
+12. 判别两个数的符号是否相通，可以通过==二进制中 的符号位是否为1来判断==， 正数的符号位为 0 ，负数的符号位为 1， 这就说明 正数 和 负数 进行异或的话，符号位还是为 1，也就是结果还是负数。
+
+13. 位掩码 与 位运算 可以对数的二进制任何位置进行操作
 
 #### 逻辑与 &
 
@@ -443,6 +483,12 @@ q.put((priority, 1, 0, 1)) # priorty 之后的元素是 item成员
 2.  找交点问题
 
     * 多链表的相交问题，是从两条链表的头节点同时出发，到达链表的末尾的时候，就切换到另外一条链表继续前进。相遇的点就是交点，或者是None。因为在 m + n 步之后一定会停止即（两个指针同时指向了 None）。PS：m，n 是两条链表的长度。[160. 相交链表 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/intersection-of-two-linked-lists/)
+    
+3. 主要技巧
+
+    * 链表拆分（空间复杂度位 0（1），因为在原链表的修改不视为空间的使用） [复制带随机指针的链表 - 复制带随机指针的链表 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/copy-list-with-random-pointer/solution/fu-zhi-dai-sui-ji-zhi-zhen-de-lian-biao-rblsf/)
+    * 虚拟头节点
+    * 快慢指针（检测循环）
 
 ## 排序
 
@@ -826,17 +872,79 @@ def prime_table(n):
 12. 顺时针旋转矩阵 90 度
     1. step1： 水平上下翻转
     2. step2：主对角线翻转
+    
+13. 约瑟夫环问题(存在数学递归解法)
+
+     参考资料：[Java解决约瑟夫环问题，告诉你为什么模拟会超时！ - 圆圈中最后剩下的数字 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/solution/javajie-jue-yue-se-fu-huan-wen-ti-gao-su-ni-wei-sh/)
+
+```python
+   # 数学解法 递归写法
+    def lastRemaining(self, n: int, m: int) -> int:
+        # 后序遍历
+        # 定义： 在数组长度为n的时候，删除第 m 个元素的时候，最后保留下来的序列号
+        def dfs(n, m):
+            if n == 1: return 0
+            last = dfs(n-1, m)
+            return (last + m) % n
+        
+        return dfs(n, m)
+    
+    # 自低向上的迭代解法
+    def lastRemaining(self, n: int, m: int) -> int:
+        res = 0
+        for i in range(2, n+1): # 枚举的是数组长度
+            res = (res + m) % i
+        return res
+```
+
+14, 旋转数组特性 ==首尾相连==，
+
+
 
 ## 动态规划
 
 ### 知识点
 
-==动态规划，最重要的点就是`子问题的独立性`，只要能剥离出独立的子问题都可以使用动态规划来完成==
+1. ==动态规划，最重要的点就是`子问题的独立性`，只要能剥离出独立的子问题都可以使用动态规划来完成==
+
+2. 字符串问题有较多可以使用动态规划的技巧
 
 ### 一维DP
 
 1. 一般`子序列问题`， 大多都是需要动态规划思想来解决
+   
     1. 最长递增子序列问题
+    
+        具有0(nlogn) 的解法，需要记住。比较通用
+    
+        ```python
+        class Solution:
+            # O(nlogn) 解法
+            def lengthOfLIS(self, nums: List[int]) -> int:
+                n = len(nums)
+                # res 是有序的
+                res = [] # res[i] 表示的是 递增子序列 长度 为 i+1 时，其最小结尾元素
+                for item in nums:
+                    if not res or res[-1] < item:
+                        res.append(item)
+                        continue
+        
+                    l, r = 0, len(res) - 1
+                    # 找寻的是 res 中大于等于 item 的第一个元素
+                    while l <= r:
+                        mid = (l + r) // 2
+                        if res[mid] >= item:
+                            r = mid - 1
+                        else: 
+                            l = mid + 1
+        
+                    # 改变相应的值
+                    res[l] = item
+                
+                return len(res)
+        
+        ```
+    
 2. 最大整除数组（与1类似，但是需要给出具体的最大集合，值得学习）[【宫水三叶の相信科学系列】详解为何能转换为序列 DP 问题 - 最大整除子集 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/largest-divisible-subset/solution/gong-shui-san-xie-noxiang-xin-ke-xue-xi-0a3jc/)
 3. 思维不要局限在 动态规划 只能基于数组的思维方式，也是可以基于字典等其它复杂结构。
 
@@ -844,13 +952,17 @@ def prime_table(n):
 
 1. 背包问题 / 组合问题 / 完全背包问题
 
-    1. 不考虑顺序 背包问题
+    1. 背包问题特性：==在一定条件下，选择集合的最优子集过程==
 
-        $dp[i][j]$ 表示的是 使用前 i 个物品，在背包容量为 j 的时候 能获得 的 最大 价值 $dp[i][j]$
+    2. 不考虑顺序 背包问题
+
+        $dp[i][j]$ 表示的是 使用前 i 个物品，在背包容量为 j 的时候 能获得 的 最大 价值 $dp[i][j]$， 状态转移为 $dp[i][j] = max(dp[i-1][j], dp[i-1][j-nums[i-1]] + nums[i-1])$，分别代表的是 不取物品 nums[i-1] ，以及取物品nums[i-1]。
 
         做选择的时候，第 i 件物品有两种可能，加入背包或者 不加入背包（在这两种状态中选择最优的即可）。
 
     0-1背包问题：[416. 分割等和子集 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/partition-equal-subset-sum/)
+
+    多个限制因素的0-1背包问题：[474. 一和零 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/ones-and-zeroes/)
 
     完全背包问题：[518. 零钱兑换 II - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/coin-change-2/)
 
@@ -863,9 +975,13 @@ def prime_table(n):
     属于单序列2维DP问题
 
     [486. 预测赢家 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/predict-the-winner/submissions/)
-    
+
     [5. 最长回文子串 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/longest-palindromic-substring/)
-    
+
+    属于多序列2维DP问题
+
+    [97. 交错字符串 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/interleaving-string/)
+
 3. 最长公共子序列问题
 
     $dp[i][j]$ 表示的是 str1[ 0 : i ] 和 str2[  0 :  j ] 构成的最大公共子序列长度
@@ -961,6 +1077,18 @@ def KMP(main, patten):
 
 1. **split()的时候，多个空格当成一个空格；split(' ')的时候，多个空格都要分割，每个空格分割出来空。**
 
+### 特定字符的重复子串检验
+
+1. 如果使用字符串比较的方法，太耗时。一般采取hash策略，即将某一子串 进行 独有编码为一个数字进行比较，则可以在 O(1) 的时间复杂度下，完成重复子串的检验工作。
+
+2. 两种方法：
+
+    1. Rabin-Karp：使用旋转哈希实现常数时间窗口切片
+
+    2. 二进制掩码
+
+    参考资料：[重复的DNA序列 - 重复的DNA序列 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/repeated-dna-sequences/solution/zhong-fu-de-dnaxu-lie-by-leetcode/)
+
 ## 数论
 
 1. 整除相关：
@@ -980,8 +1108,31 @@ def KMP(main, patten):
 
 ##  随机化算法
 
-1. Fisher-Yates 洗牌算法 （公平的随机排列）
+### Fisher-Yates 洗牌算法 （公平的随机排列）
+
+特点：
+
+1. 数据完全加载进数组中
 
 **算法**
 
 Fisher-Yates 洗牌算法跟暴力算法很像。在每次迭代中，生成一个范围在当前下标到数组末尾元素下标之间的随机整数。接下来，将当前元素和随机选出的下标所指的元素互相交换 - 这一步模拟了每次从 “帽子” 里面摸一个元素的过程，其中选取下标范围的依据在于每个被摸出的元素都不可能再被摸出来了。此外还有一个需要注意的细节，当前元素是可以和它本身互相交换的 - 否则生成最后的排列组合的概率就不对了。[打乱数组 - 打乱数组 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/shuffle-an-array/solution/da-luan-shu-zu-by-leetcode/)
+
+### 蓄水池抽样算法
+
+特点：
+
+1. 数据量大小未知
+2. 每个被抽取的概率是相等的
+
+当内存==无法加载全部数据==时，如何从包含未知大小的数据流中随机选取m个数据，并且要保证每个数据被抽取到的概率相等.
+
+算法：
+
+1. 如果接收的数据量小于等于m，则依次放入蓄水池。(蓄水池长度为 m 的数组)
+
+2. 当接收到第 i 个数据时，i > m，在 [1, i] 范围内取随机数 d，若 d 落在[1, m] 范围内，则用接收到的第 i 个数据替换蓄水池中的第 d 个数据（索引为 d - 1）。
+
+3. 重复步骤2， 直到整个数据被遍历
+
+参考资料：[蓄水池抽样算法（Reservoir Sampling） - 简书 (jianshu.com)](https://www.jianshu.com/p/7a9ea6ece2af)

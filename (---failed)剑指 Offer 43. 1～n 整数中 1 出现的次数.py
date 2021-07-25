@@ -1,24 +1,40 @@
 class Solution:
+    # 找规律，值得注意的是对于当前位次出现的数字的情况进行讨论
     def countDigitOne(self, n: int) -> int:
-        if n <= 9: return 1
+        high, cur, low = n // 10, n % 10, 0
+        digit, res = 1, 0
+        while high or cur: # 当还没有完全扫描完数字的时候
+            if cur == 0: res += high * digit
+            elif cur == 1: res += high * digit + low + 1
+            else: res += (high + 1) * digit
+            # 移动 位 更新状态
+            low += cur * digit
+            cur = high % 10
+            high //= 10
+            digit *= 10
+        
+        return res
 
-        import math
-        k = int(math.log10(n)) + 1 # 位数
-        left = n // 10**(k - 1) + 1
-        right = 10**(k - 1)
-        dp = [0]*(1 + k) # 第 i 位出现 1 的次数
-        # base-case
-        dp[k] = n % 10**(k-1) + 1 + (right if n // 10**(k - 1) > 1 else 0) 
+    # 基于递归的方法
+    def countDigitOne(self, n: int) -> int:
+        from functools import lru_cache
+        
+        @lru_cache(None)
+        # [1--n] 中有多少个1
+        def dfs(n):
+            if n <= 0: return 0
+            
+            string = str(n)
+            m = len(string)
+            first = int(string[0])
+            cur = 10**(m - 1)
+            last = n % cur
 
-        print(k, dp[k], left, right)
-        for i in range(k-1, 0, -1):
+            if first == 1: 
+                return dfs(cur - 1) + dfs(last) + last + 1
+            else:
+                return first * dfs(cur - 1) + dfs(last) + cur
 
-            l, r = k - i, i-1 # 比 i 位高的位数, 比 i 位低的位数
-            right //= 10
-            dp[i] =  left * right
-            left *= 10 
+        return dfs(n) 
 
-        print(dp) 
-        return sum(dp)
-
-print(Solution().countDigitOne(20))
+print(Solution().countDigitOne(1234))
