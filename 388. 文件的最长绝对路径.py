@@ -1,24 +1,26 @@
 class Solution:
     def lengthLongestPath(self, input: str) -> int:
-        from collections import deque
-        import re
-        q = deque([(input, 0)])
-        ans = 0
-        layer = 0
-        while q:
-            sz = len(q)
-            layer += 1
-            for _ in range(sz):
-                path, k = q.popleft()
-                k += 1
-                nxts = re.split(r'\n' + r'\t'*layer + r'(?!\t)', path)
-                k += len(nxts[0])
-                if len(nxts) == 1:
-                    ans = max(ans, k)
-                else:
-                    for next in nxts[1:]:
-                        q.append((next, k))
-        return ans - 1
 
+        def dfs(s, k):
+            # 代表没有分级的情况
+            if '\n' not in s: 
+                return len(s) if '.' in s else float('-inf')
+            target = '\n' + '\t'*k
+            n, p = len(s), len(target)
+            father = 0
+            prev = 0
+            nxt = []
+            ans = float('-inf')
+            for i in range(n - p + 1):
+                if s[i: i+p] == target and (i + p >= n or s[i+p] != '\t'):
+                    if k and not father:
+                        father = i
+                    if k == 0 or prev: ans = max(ans, dfs(s[prev: i], k + 1) + father + int(k > 0) )
+                    prev = i + p
+            
+            return max(ans, dfs(s[prev: n], k+1) + int(k > 0) + father ) 
+        
+        return max(0, dfs(input, 0))       
 
-print(Solution().lengthLongestPath("dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext"))
+print(Solution().lengthLongestPath(
+"a\n\taa\n\t\taaa\n\t\t\tfile1234567890123.txt\naaaaaaaaaaaaaaaaaaaaa\n\tsth.png"))

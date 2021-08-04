@@ -3,7 +3,6 @@ class Solution:
         if label == 1:
             return [1]
         d = len(bin(label)[2:]) - 1
-        print(d)
         ans = [label]
         while label > 1:
             total = (2**(d)-1 + 2**(d-1))

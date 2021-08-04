@@ -265,9 +265,9 @@ class NumTree:
         
         while pos > 0:
             l = r = pos
-            if pos % 2: #如果 pos 是 右子节点
+            if pos % 2: #如果 pos 是 右子节点(还差左节点，左节点为 pos - 1)
                 l = pos - 1
-            else: # 如果 pos 是左子节点
+            else: # 如果 pos 是左子节点(还差右节点，右节点为 pos + 1)
                 r = pos + 1 
             
             pos //= 2 # 父节点
@@ -285,12 +285,37 @@ class NumTree:
             if r % 2 == 0:
                 ans += self.tree[r]
                 r -= 1
-        
+            # 回溯到根节点
+            l //= 2
+            r //= 2
+
+        # 回到同一个根节点     
         if l == r:
             ans += self.tree[l]
         
         return ans
 
+# 树状数组\
+
+# 解决区域异或问题
+class BIT:
+    def __init__(self, nums):
+        self.n = len(nums)
+        self.store = [0]*(1+self.n) # 树状数组真实有效的索引从 1 开始
+        for i in range(1, 1+self.n):
+            self.update(i, nums[i-1])
+    
+    def update(self, idx, val):
+        while idx <= self.n:
+            self.store[idx] ^= val
+            idx += idx & -idx
+    
+    def xorrange(self, cur):
+        res = 0
+        while cur > 0:
+            res ^= self.store[cur]
+            cur -= cur & -cur
+        return res
 
 # 快速乘法模板
 def mul(a, b):
