@@ -46,5 +46,10 @@ var tmp = window.alert // 暂存 alert 方法
 window.alert = function(){console.log('has been hook!')}
 ```
 
+#### hook 时机
 
+1. 控制台注入的hook，刷新页面就失效
+2. 在网页加载的第一个JS的位置，第一行下断点，然后控制台手动注入hook（有可能注入的hook还是晚了一些）3
+3. 利用 FD 的替换响应，注入 hook ，这种类型的注入时间比较靠前
+4. Hook 局部变量的时候，需要在生成局部变量的位置下断点，之后动态注入 hook。
 

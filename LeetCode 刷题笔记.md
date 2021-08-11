@@ -148,6 +148,10 @@
 
  或运算，是无进位的加法运算
 
+#### 状态压缩技巧
+
+==（做n个元素的组合，可以使用状态压缩技巧）==在给定n个元素的时候，枚举n 个元素的选择状态可以基于二进制的表示即，$2^{m}$ 表示的是选择第 m + 1 个元素。可以实现0(1) 空间复炸度。
+
 #### 大小写转换使用位运算
 
 ```shell
@@ -160,7 +164,14 @@
 
 <hr>
 #### 有关于 2 的 幂函数，都可以通过位运算进行
+#### 状态压缩
 
+1. 指的是将某个状态是否发生，映射到一个树的bit位上。
+
+#### bitmap算法
+
+1. 对连续数字以32为桶容量进行分组，在每一个组中有一个32位的数字，第 i 位表示的是 第 k 组中的第 i 个元素。举个例子比如整数num其应该落在：$num / 32$ 的桶中，是 第 $num \% 32$ 个元素。
+2. [705. 设计哈希集合 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/design-hashset/)
 
 
 ## 树
@@ -293,13 +304,17 @@ class Solution:
 
 ==注意：== 树的题目，使用DFS解法时，一定要注意迭代方式 
 
-### 字典树
+### 字典树（大多用于字符串中）
 
 字典树 又 称为前缀树，是特殊的n叉树解构，需要一个根节点来驱动。
 
 [数组中两个数的最大异或值 - 数组中两个数的最大异或值 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/maximum-xor-of-two-numbers-in-an-array/solution/shu-zu-zhong-liang-ge-shu-de-zui-da-yi-h-n9m9/)
 
 [208. 实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree/)
+
+对于数值按照字典序排列实际上不需要构建真的前缀树，只要字节点是 父节点 * 10 + i (i in range(10))的关系， 这就是数值化的前缀树。
+
+[386. 字典序排数 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/lexicographical-numbers/)
 
 ```python
 # 模板
@@ -923,13 +938,16 @@ def prime_table(n):
 
      [560. 和为K的子数组 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/subarray-sum-equals-k/)
 
-12. 顺时针旋转矩阵 90 度
+12. `顺时针旋转矩阵 90 度`
+    
     1. step1： 水平上下翻转
     2. step2：主对角线翻转
     
 13. 约瑟夫环问题(存在数学递归解法)
 
      参考资料：[Java解决约瑟夫环问题，告诉你为什么模拟会超时！ - 圆圈中最后剩下的数字 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/solution/javajie-jue-yue-se-fu-huan-wen-ti-gao-su-ni-wei-sh/)
+    
+    （变种）[390. 消除游戏 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/elimination-game/)
 
 ```python
    # 数学解法 递归写法
@@ -1086,6 +1104,20 @@ def prime_table(n):
 2. 最大整除数组（与1类似，但是需要给出具体的最大集合，值得学习）[【宫水三叶の相信科学系列】详解为何能转换为序列 DP 问题 - 最大整除子集 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/largest-divisible-subset/solution/gong-shui-san-xie-noxiang-xin-ke-xue-xi-0a3jc/)
 3. 思维不要局限在 动态规划 只能基于数组的思维方式，也是可以基于字典等其它复杂结构。
 
+### 博弈问题
+
+1. 拿石子只能从数组左边界或者右边界拿，这就保证了区间的连续性，可以使用区间DP来处理。
+
+    状态定义：$dp[i][j]$  表示当剩下的石子堆为下标 i 到下标 j 时，即在下标范围 i, j 中，当前玩家与另一个玩家的博弈之差的最大值，注意当前玩家不一定是先手。
+
+    [877. 石子游戏 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/stone-game/)
+
+2. 拿到一定数额的选手获胜
+
+    通过枚举来实现：状态压缩技巧 + DFS
+
+    [464. 我能赢吗 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/can-i-win/)
+
 ### 二维DP
 
 1. 背包问题 / 组合问题 / 完全背包问题
@@ -1133,16 +1165,6 @@ def prime_table(n):
     dp\[i\]\[j\] 表示字符串 *t* 中从位置 i 开始往后直到字符 j 第一次出现的位置
 
     base-case: dp\[len(t)\][*] = m 表示不存在
-    
-6. 经典博弈问题
-
-    拿石子只能从数组左边界或者右边界拿，这就保证了区间的连续性，可以使用区间DP来处理。
-
-    状态定义：$dp[i][j]$  表示当剩下的石子堆为下标 i 到下标 j 时，即在下标范围 i, j 中，当前玩家与另一个玩家的博弈之差的最大值，注意当前玩家不一定是先手。
-
-    [877. 石子游戏 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/stone-game/)
-
-
 
 ## 字符串
 
@@ -1263,9 +1285,25 @@ def KMP(main, patten):
 
     * 把 n 个小球放到 m 个盒子里，盒子可以为空，答案为 C(n + m - 1, m - 1)。
 
-    
+3. 求最大公约数的两种方法
 
+    1. 辗转相除法
 
+        `定理`: 两个正整数 a 和 b (a > b) ，他们的最大公约数等于 a 除以 b 的余数 c 和 b 之间的最大公约数。
+
+    2. 更相减损术
+
+        `定理`：两个正整数 a 和 b (a > b)，它们的最大公约数等于 a - b 的差值 c 和较小数 b 的最大公约数。
+
+    3. 优化算法
+
+    ![image-20210811141039522](D:\桌面\学习记录\markdwon笔记图片保存内容\image-20210811141039522.png)
+
+    [漫画算法：辗转相除法是什么鬼？ - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/31824895#:~:text=辗转相除法， 又名欧几里得算法（Euclidean algorithm），目的是求出两个正整数的最大公约数。 它是已知最古老的算法，,其可追溯至公元前300年前。 这条算法基于一个定理： 两个正整数a和b（a>b），它们的最大公约数等于a除以b的余数c和b之间的最大公约数。 比如10和25，25除以10商2余5%2C那么10和25的最大公约数，等同于10和5的最大公约数。)
+
+4. 费马平方和定理
+
+    `定理`:一个非负整数 c 如果能够表示为两个整数的平方和，==当且仅当 c 的所有形如  $ 4*k + 3 $ 的质因子的幂均为偶数==。 （后半句指的是 c 的质因子分解式中，所有形如  $ 4*k + 3 $ 的质因子都是偶数次的）
 
 ##  随机化算法
 
@@ -1297,3 +1335,11 @@ Fisher-Yates 洗牌算法跟暴力算法很像。在每次迭代中，生成一�
 3. 重复步骤2， 直到整个数据被遍历
 
 参考资料：[蓄水池抽样算法（Reservoir Sampling） - 简书 (jianshu.com)](https://www.jianshu.com/p/7a9ea6ece2af)
+
+### 拒绝采样方法
+
+基本原理：产生具有更大取值范围的等概率随机数，每次只取自己需要的取值范围内的随机数（也是等概率的），在拒绝域的数字需要重新采样。
+
+有这样一个事实 (randX() - 1)*Y + randY() 可以等概率的生成[1, X * Y]范围的随机数（看成Y进制问题）
+
+[470. 用 Rand7() 实现 Rand10() - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/implement-rand10-using-rand7/submissions/)
