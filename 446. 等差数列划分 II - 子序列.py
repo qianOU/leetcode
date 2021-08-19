@@ -9,7 +9,6 @@ class Solution:
         for i in range(n):
             for j in range(i):
                 ans += dp[j][nums[i] - nums[j]]
-                print(i, j, dp[j][nums[i] - nums[j]], ans)
                 dp[i][nums[i] - nums[j]] += dp[j][nums[i] - nums[j]] + 1
       
         return ans

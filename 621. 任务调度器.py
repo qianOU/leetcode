@@ -1,5 +1,6 @@
 class Solution:
-    # 贪心 + 队列
+    # 思维1:模拟 贪心 + 堆
+    # 贪心思维是每次拿数量较多的不同元素优先进行组合, 使用堆来维护
     def leastInterval(self, tasks, n: int) -> int:
         import heapq
 
@@ -33,7 +34,11 @@ class Solution:
             else: # 提早结束部分
                 ans += i
         return ans
-print(Solution().leastInterval(
-["A","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
-,29
-))
+    
+    # 思维2：填桶思想 十分的妙
+    # https://leetcode-cn.com/problems/task-scheduler/solution/tian-tong-si-lu-you-tu-kan-wan-jiu-dong-by-mei-jia/
+    def leastInterval(self, tasks, n: int) -> int:
+        counter = Counter(tasks)
+        max_num = counter.most_common(1)[0][1]
+        last = sum(v == max_num  for v in counter.values())
+        return max((n+1)*(max_num-1) + last, len(tasks))

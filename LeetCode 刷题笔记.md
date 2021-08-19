@@ -59,6 +59,17 @@
 22. 合法括号的生成以及判断问题
 
      * 在生成过程中一定有左括号大于等于右括号的规律存在。
+    
+23. Python 负数索引的时候，如下，注意中间的值不能是负数，如果想表示倒置到0，则slice切片中间的值应该赋值为 None
+
+     ```python
+     s = '1234'
+     s[3:-1:-1] 是错误的因为中间的-1被认为是最后字符索引了
+     正确的索引方式是
+     s[3:None:-1]
+     ```
+
+     
 
 ## 位运算
 
@@ -70,8 +81,16 @@
 3.相同的数异或为0: n ^ n => 0
 ### 重要的点
 4 4i⊕(4i+1)⊕(4i+2)⊕(4i+3)=0 # 异或的性质 1^2^3 = 0
-5. c = a ^ b 则有 a = c ^ b 
-6. 对数字的取反也可以使用异或来完成，和指定位数全为 1 的数字进行异或
+
+5. 对于1...n 进行异或运算有下面性质
+k, res = divmod(n, 4)
+res = 0 --> n
+res = 1 --> 1
+res = 2 --> n+1
+res = 3 -->  0
+
+6. c = a ^ b 则有 a = c ^ b 
+7. 对数字的取反也可以使用异或来完成，和指定位数全为 1 的数字进行异或
 	res ^ 0xffffffff 表示的就是对 res 后32位取反
 ```
 
@@ -795,12 +814,42 @@ $$
                 n >>= 1
            return res
 
-            return quickPow(x, n) if n >= 0 else 1 / quickPow(x, -n)
+            return quickPow(x, n) if n >= 0 else 1 / quikPow(x, -n)
 ```
 
-
-
 参考资料：[50. Pow(x, n) - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/powx-n/)
+
+### 矩阵快速幂算法
+
+应用：矩阵快速幂用于求解一般性问题：给定大小为 n * n 的矩阵 M*，求答案矩阵 $M^{k}$，通常需要并对答案矩阵中的每位元素对  p 取模。
+
+==只不过是将快速幂运算运用到矩阵中==
+
+时间消耗： *O*(log*n*) 的复杂度
+
+```python
+base = 10**9 + 7
+def matrix_mul(a, b): # 矩阵乘法 a * b
+    m, tmp, n = len(a), len(a[0]), len(b)
+    res = [[0]*n for i in range(m)]
+    for i in range(m):
+        for j in range(n):
+            for k in range(tmp):
+                res[i][j] += a[i][k] * b[k][j] 
+                res[i][j] %= base  # 求余
+    return res
+
+# 矩阵快速幂
+def quick_mat_power(mat, n):
+    ans = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    while n:
+        if n & 1: ans = matrix_mul(ans, mat)
+        mat = matrix_mul(mat, mat) # 矩阵翻一番
+        n >>= 1 # 右移一位
+    return ans
+```
+
+[1137. 第 N 个泰波那契数 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/n-th-tribonacci-number/)
 
 ### 1. 获得某一个整数各个位数上的值
 
@@ -1304,6 +1353,32 @@ def KMP(main, patten):
 4. 费马平方和定理
 
     `定理`:一个非负整数 c 如果能够表示为两个整数的平方和，==当且仅当 c 的所有形如  $ 4*k + 3 $ 的质因子的幂均为偶数==。 （后半句指的是 c 的质因子分解式中，所有形如  $ 4*k + 3 $ 的质因子都是偶数次的）
+    
+    
+    
+5. 质数分解算法
+
+```python
+
+ans = []
+d = 2 # 最小素数
+while n > 1:
+    while n % d == 0:
+        ans.append(d)
+        n /= d # 分解出素数 d
+    d += 1
+
+```
+
+6. 裴蜀定理（贝祖定理）
+
+    `定理`：对于任何整数  $ a, b $  和他们的最大公约数 $d$  ，关于未知数   $ x,y$   的线性不定方程（称为裴蜀等式）；若 $a, b$ 是整数，且 gcd(a, b) = d，那么对于任意的整数 x，y， ax + by 都一定是 d 的倍数，特别地，一定存在整数 x, y ， 使得 ax + by = d 成立。
+
+    `变样表达`：ax+by=z 求二元一次方程的整数解(x, y, z 已知，求  a, b 的整数解) 有整数解的前提是  x  与  y 的最大公约数 能被 z 整除
+
+    [365. 水壶问题 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/water-and-jug-problem/)
+    
+    
 
 ##  随机化算法
 
