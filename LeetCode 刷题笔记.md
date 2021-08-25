@@ -69,7 +69,36 @@
      s[3:None:-1]
      ```
 
-     
+24. 对于有多个控制条件的寻求最优解的通法是，枚举其中一种条件的所有情况，再统计在该条件下的最优解，最后进行比较即可。
+
+25. 比较 a 是否是 b 的子序列的暴力解法 ----- `使用迭代器，优美`
+
+     ```python
+     def subseq(word): # 判断 word 是否是 S 的子序列
+        it = iter(S)
+        return all(x in it for x in word) # x如果不与it产出的元素相等，则it会不断产出值进行比较 
+     ```
+
+26. 字典结构的使用技巧
+
+     ```python
+     a = {1: 3}
+     a.pop(1) # 删除字典中key为 1 的键值对，并且放回对应的值
+     a.pop(5, None) # 如果a中没有5作为键，则返回第二个参数作为默认值
+     ```
+
+27. 迭代器的一些使用技巧
+
+     ```python
+     a = iter(range(3))
+     next(a, None) # 调用next产生元素，当迭代器产出所有的元素之后，默认会抛出StopIterationError错误，使用第二个参数可以指定所有元素产出之后，产出默认值（不报错）
+     ```
+
+28. 元组
+
+     1. () 代表的是空元组,
+
+     2. (1, ) 代表的是只有一个元素的元组，只有一个元素的时候需要使用逗号
 
 ## 位运算
 
@@ -215,7 +244,24 @@ res = 3 -->  0
 
 1. 二叉搜索树的==中序遍历==得到的是==单调递增==的序列
 
-    
+2. 验证二叉搜索树的前序遍历结果  【使用局部有序特性，单调栈  0(n) 的方法】
+
+    ```python
+    class Solution:
+        def verifyPreorder(self, preorder: List[int]) -> bool:
+            stack = []
+            val = float('-inf') # val记录的是除去遍历节点的子树的最小值
+            for i in preorder:
+                if i < val: return False # 
+                while stack and stack[-1] < i: # 左子树遍历完全，回溯到根节点
+                    val = stack.pop()
+                stack.append(i)
+            return True
+    ```
+
+    [255. 验证前序遍历序列二叉搜索树](https://leetcode-cn.com/problems/verify-preorder-sequence-in-binary-search-tree/)
+
+3.  
 
 ### 完全二叉树
 
@@ -323,6 +369,8 @@ class Solution:
 
 ==注意：== 树的题目，使用DFS解法时，一定要注意迭代方式 
 
+## 高级数据结构
+
 ### 字典树（大多用于字符串中）
 
 字典树 又 称为前缀树，是特殊的n叉树解构，需要一个根节点来驱动。
@@ -374,12 +422,91 @@ class Solution:
         return max([t.searchMax(n) for n in nums])
 ```
 
-### 线段树
+### 线段树SegmentTree
 
 **算法：**==满二叉树==
 线段树是一种非常灵活的数据结构，它可以用于解决多种范围查询问题，比如在对数时间内从数组中找到最小值、最大值、总和、最大公约数、最小公倍数等。
 
+主要用于处理区间问题
+
+1. 区间异或问题代码如下
+
+
+```python
+class NumTree:
+    def __init__(self, nums):
+        self.n = n = len(nums)
+        self.nums = [0]*2*n # 完全二叉树（索引位置为0的空出来）
+        # 叶子节点赋值
+        for i in range(n, 2*n):
+            self.nums[i] ^= nums[i-n]
+        # 父亲节点赋值
+        for i in range(n-1, 0, -1):
+            # 索引关系构建左子树与右子数
+            self.nums[i] = self.nums[2*i] ^ self.nums[2*i+1]
+
+    def update(self, idx, val):
+        pos =  self.n + idx
+        self.nums[pos] = val
+        while pos > 0: # 更新是从叶子节点，一直更新回溯到根节点
+            l = r = pos
+            if pos % 2: l = pos - 1 # 如果 pos 是右子节点(还差左节点，左节点为 pos - 1)
+            else: r = pos + 1  # 如果 pos 是左子节点(还差右节点，右节点为 pos + 1)
+
+            pos //= 2
+            self.nums[pos] = self.nums[l] ^ self.nums[r]
+
+    def xorange(self, left, right):
+        l = self.n + left
+        r = self.n + right
+        res = 0
+        while l < r:
+            if l % 2: 
+                res ^= self.nums[l]
+                l += 1
+            if r%2 == 0:
+                res ^= self.nums[r]
+                r -= 1
+            # 回溯到根节点
+            l //= 2
+            r //= 2
+
+        # 如果回到了同一个根节点
+        if l == r: res ^= self.nums[l]
+
+        return res
+```
 [区域和检索 - 数组可修改 - 区域和检索 - 数组可修改 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/range-sum-query-mutable/solution/qu-yu-he-jian-suo-shu-zu-ke-xiu-gai-by-leetcode/)
+
+### 树状数组BIT
+
+1. 前缀和用于没有单点修改的区间问题
+
+2. 树状数组实质是`动态的前缀和`，支持高效的单点修改和动态区间问题（求和）
+
+    lowbit 的妙用
+
+```python
+# 以求区间异或问题为例
+class BIT:
+    def __init__(self, nums):
+        self.n = len(nums)
+        self.store = [0]*(1+self.n) # 树状数组真实有效的索引从 1 开始
+        for i in range(1, 1+self.n):
+            self.update(i, nums[i-1])
+    # 单点更新
+    def update(self, idx, val):
+        while idx <= self.n:
+            self.store[idx] ^= val
+            idx += idx & -idx # lowbit 位加1
+	# 高效查询前缀异或值
+    def xorrange(self, cur):
+        res = 0
+        while cur > 0:
+            res ^= self.store[cur]
+            cur -= cur & -cur # 去掉 lowbit 位
+        return res
+```
 
 
 
@@ -709,11 +836,26 @@ eg: [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kt
 
         
 
-1. * 
+### 最短路径问题
+
+主要有以下`三种解决方法`：
+
+1. Floyd 算法
+
+    其原始的三维状态定义为 $f[i][j][k]，f[i][j][k]$ 代表从点 i 到点 j，且经过的所有点编号不会超过 k（即可使用点编号范围为 [1, k]）的最短路径。
+    著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+2. Bellman Ford算法
+
+    其原始的状态定义为 $f[i][k]$ 代表从起点到 i 点，且经过最多 k 条边的最短路径
+
+3. Dijistra算法（花费代价必须是正数）基于优先队列的解法
+
+==note==：前两种实质是动态规划的解法
 
 ## 整数相关
 
-## 整除运算
+### 整除运算
 
 1. 在python中 整除 分为 `浮点数整除 与 整数整除两种`。在大树的条件下，这两类得到的结果是可能`存在差异`的。
 
@@ -992,11 +1134,15 @@ def prime_table(n):
     1. step1： 水平上下翻转
     2. step2：主对角线翻转
     
-13. 约瑟夫环问题(存在数学递归解法)
+13. 顺时针按层填充的数组，大多需要按层来分解求解
 
-     参考资料：[Java解决约瑟夫环问题，告诉你为什么模拟会超时！ - 圆圈中最后剩下的数字 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/solution/javajie-jue-yue-se-fu-huan-wen-ti-gao-su-ni-wei-sh/)
-    
-    （变种）[390. 消除游戏 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/elimination-game/)
+     [LCP 29. 乐团站位 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/SNJvJP/)
+
+14. 约瑟夫环问题(存在数学递归解法)
+
+      参考资料：[Java解决约瑟夫环问题，告诉你为什么模拟会超时！ - 圆圈中最后剩下的数字 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/solution/javajie-jue-yue-se-fu-huan-wen-ti-gao-su-ni-wei-sh/)
+
+     （变种）[390. 消除游戏 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/elimination-game/)
 
 ```python
    # 数学解法 递归写法
@@ -1020,89 +1166,7 @@ def prime_table(n):
 
 14. 旋转数组特性 ==首尾相连==，
 
-### 树状数组，线段树，前缀和
 
-1. 前缀和用于没有单点修改的，区间问题
-
-2. 树状数组实质是动态的前缀和，支持高效的单点修改和动态区间问题（求和）
-
-    lowbit 的妙用
-
-    ```python
-    # 以求区间异或问题为例
-    class BIT:
-        def __init__(self, nums):
-            self.n = len(nums)
-            self.store = [0]*(1+self.n) # 树状数组真实有效的索引从 1 开始
-            for i in range(1, 1+self.n):
-                self.update(i, nums[i-1])
-        # 单点更新
-        def update(self, idx, val):
-            while idx <= self.n:
-                self.store[idx] ^= val
-                idx += idx & -idx # lowbit 位加1
-    	# 高效查询前缀异或值
-        def xorrange(self, cur):
-            res = 0
-            while cur > 0:
-                res ^= self.store[cur]
-                cur -= cur & -cur # 去掉 lowbit 位
-            return res
-    ```
-
-    
-
-3. 线段树，可以求区间的最大值，最小值，以及求和等
-
-    ```python
-    # 异或为例
-    class NumTree:
-        def __init__(self, nums):
-            self.n = n = len(nums)
-            self.nums = [0]*2*n # 完全二叉树（索引位置为0的空出来）
-            
-            # 叶子节点赋值
-            for i in range(n, 2*n):
-                self.nums[i] ^= nums[i-n]
-            # 父亲节点赋值
-            for i in range(n-1, 0, -1):
-                # 索引关系构建左子树与右子数
-                self.nums[i] = self.nums[2*i] ^ self.nums[2*i+1]
-    
-    
-        def update(self, idx, val):
-            pos =  self.n + idx
-            self.nums[pos] = val
-            while pos > 0: # 更新是从叶子节点，一直更新回溯到根节点
-                l = r = pos
-                if pos % 2: l = pos - 1 # 如果 pos 是右子节点(还差左节点，左节点为 pos - 1)
-                else: r = pos + 1  # 如果 pos 是左子节点(还差右节点，右节点为 pos + 1)
-    
-                pos //= 2
-                self.nums[pos] = self.nums[l] ^ self.nums[r]
-        
-        def xorange(self, left, right):
-            l = self.n + left
-            r = self.n + right
-            res = 0
-            while l < r:
-                if l % 2: 
-                    res ^= self.nums[l]
-                    l += 1
-                if r%2 == 0:
-                    res ^= self.nums[r]
-                    r -= 1
-                # 回溯到根节点
-                l //= 2
-                r //= 2
-    
-            # 如果回到了同一个根节点
-            if l == r: res ^= self.nums[l]
-    
-            return res
-    ```
-
-    
 
 ## 动态规划
 
@@ -1214,6 +1278,12 @@ def prime_table(n):
     dp\[i\]\[j\] 表示字符串 *t* 中从位置 i 开始往后直到字符 j 第一次出现的位置
 
     base-case: dp\[len(t)\][*] = m 表示不存在
+    
+6. 判别是否是子序列的动态规划方法（有点类似next数组的意思）`十分巧妙！`
+
+    $dp[i][j]$ 表示的是 $string[i...]$ 中首次出现 字符 j 转态的 索引位置
+
+    [792. 匹配子序列的单词数 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/number-of-matching-subsequences/)
 
 ## 字符串
 
@@ -1378,6 +1448,12 @@ while n > 1:
 
     [365. 水壶问题 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/water-and-jug-problem/)
     
+7. 康托尔对角线法进行构造不同字符串
+
+    原理：构造的子串的第 i 个字符与 第 i 个字符串的第 i 个字符不同，即可确保构造出来的字符串是不在已知集合中的新字符串。
+
+    [康托对角线 - 找出不同的二进制字符串 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/find-unique-binary-string/)
+
     
 
 ##  随机化算法
