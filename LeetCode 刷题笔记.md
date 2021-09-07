@@ -96,9 +96,13 @@
 
 28. 元组
 
-     1. () 代表的是空元组,
+      1. () 代表的是空元组,
+ 2. (1, ) 代表的是只有一个元素的元组，只有一个元素的时候需要使用逗号
+    
+29. 取整  $ \frac{x}{y}$
 
-     2. (1, ) 代表的是只有一个元素的元组，只有一个元素的时候需要使用逗号
+     1. 向上取整--->  $\frac{x+(y-1)}{y}$
+     2. 向下取整 ----> $ \frac{x}{y} $ 
 
 ## 位运算
 
@@ -481,6 +485,10 @@ class NumTree:
 ### 树状数组BIT
 
 1. 前缀和用于没有单点修改的区间问题
+
+    以下是一个在`树中使用前缀和`技巧的题目，较为经典
+
+    [剑指 Offer II 050. 向下的路径节点之和 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/6eUYwP/)
 
 2. 树状数组实质是`动态的前缀和`，支持高效的单点修改和动态区间问题（求和）
 
@@ -1176,6 +1184,12 @@ def prime_table(n):
 
 2. 字符串问题有较多可以使用动态规划的技巧
 
+3. 积木问题
+
+    [790. 多米诺和托米诺平铺 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/domino-and-tromino-tiling/)
+
+4. 对于转移关系是明确的线性关系的时候，可以使用`转移矩阵`和`矩阵快速幂算法`将时间复杂度下降为对数级别
+
 ### 一维DP
 
 1. 一般`子序列问题`， 大多都是需要动态规划思想来解决
@@ -1219,9 +1233,11 @@ def prime_table(n):
 
 ### 博弈问题
 
+​	状态设计的时候，只能从`当前选手`角度出发进行设计。
+
 1. 拿石子只能从数组左边界或者右边界拿，这就保证了区间的连续性，可以使用区间DP来处理。
 
-    状态定义：$dp[i][j]$  表示当剩下的石子堆为下标 i 到下标 j 时，即在下标范围 i, j 中，当前玩家与另一个玩家的博弈之差的最大值，注意当前玩家不一定是先手。
+    状态定义：$dp[i][j]$  表示当剩下的石子堆为下标 i 到下标 j 时，即在下标范围 i, j 中，`当前玩家`与另一个玩家的博弈之差的最大值，`注意当前玩家不一定是先手`。
 
     [877. 石子游戏 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/stone-game/)
 
@@ -1230,6 +1246,12 @@ def prime_table(n):
     通过枚举来实现：状态压缩技巧 + DFS
 
     [464. 我能赢吗 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/can-i-win/)
+
+3. 除数博弈问题
+
+    dp[i] 表示当黑板写的是 i 的时候当前人员是否必赢
+
+    [除数博弈 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/divisor-game/)
 
 ### 二维DP
 
@@ -1284,6 +1306,20 @@ def prime_table(n):
     $dp[i][j]$ 表示的是 $string[i...]$ 中首次出现 字符 j 转态的 索引位置
 
     [792. 匹配子序列的单词数 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/number-of-matching-subsequences/)
+
+### 树型DP
+
+主要指的是动态规划的转过程是在树型结构上完成的，自底向上，根据左右节点的dp表推导出当前节点的dp表，本质就是`后序遍历+动态规划`的思想
+
+[LCP 34. 二叉树染色 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/er-cha-shu-ran-se-UGC/)
+
+
+
+### 经典DP问题
+
+1. 缩减数据规模技巧，注意要求的精度在指定范围内，则在超过阈值之后可以用极限表示
+
+    [808. 分汤 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/soup-servings/)
 
 ## 字符串
 
@@ -1372,13 +1408,27 @@ def KMP(main, patten):
 
 1. 如果使用字符串比较的方法，太耗时。一般采取hash策略，即将某一子串 进行 独有编码为一个数字进行比较，则可以在 O(1) 的时间复杂度下，完成重复子串的检验工作。
 
-2. 两种方法：
+2. 两种方法：==将字符串转换成数值进行比较，可以在O(1)的时间复杂度内完成比较==
 
-    1. Rabin-Karp：使用旋转哈希实现常数时间窗口切片
+    1. `Rabin-Karp`：使用旋转哈希实现常数时间窗口切片
 
-    2. 二进制掩码
+    2. `二进制掩码`
 
     参考资料：[重复的DNA序列 - 重复的DNA序列 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/repeated-dna-sequences/solution/zhong-fu-de-dnaxu-lie-by-leetcode/)
+    
+    [剑指 Offer II 005. 单词长度的最大乘积 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/aseY1I/)
+
+### 回文子串
+
+回文子串的判断可以使用动态规划预处理，达到0(1) 的时间复杂度
+
+### 字符串的状态压缩
+
+==将字符串转换成数值进行比较，可以在O(1)的时间复杂度内完成比较==
+
+1. `Rabin-Karp`：使用旋转哈希实现常数时间窗口切片
+
+2. `二进制掩码`
 
 ## 数论
 
@@ -1493,4 +1543,18 @@ Fisher-Yates 洗牌算法跟暴力算法很像。在每次迭代中，生成一�
 
 有这样一个事实 (randX() - 1)*Y + randY() 可以等概率的生成[1, X * Y]范围的随机数（看成Y进制问题）
 
+前半部分描绘出的是第几个Y进制区间，后半部分是Y进制的细刻度变化范围
+
+`note`:  两个m进制的数字相乘并不是等概率的，如 4 = 1\*4 = 2\*2 所以想乘的结果中 4 和 7 的结果就不是等概率的
+
 [470. 用 Rand7() 实现 Rand10() - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/implement-rand10-using-rand7/submissions/)
+
+## 番外 Py
+
+### sortedcontainers库
+
+1. OrderedList ： 平衡二叉搜索树，即红黑树的内置实现
+
+### collections库
+
+1. OrderedDIct：哈希表 + 双向链表的结构内部实现，添加的key是按添加顺序排列的，有 move_to_end 方法
