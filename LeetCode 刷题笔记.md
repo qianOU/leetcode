@@ -720,6 +720,8 @@ BFS 中十分重要的一点，就是必修明确入队列的条件。以及去�
 
 ### 基数排序
 
+​	==只能处理正数数据==
+
 1. 基数排序是一种不基于比较的排序算法，时间复杂度为 0(n)[基数排序_百度百科 (baidu.com)](https://baike.baidu.com/item/基数排序)
 
     ```python
@@ -740,13 +742,118 @@ BFS 中十分重要的一点，就是必修明确入队列的条件。以及去�
             bucket = [[] for i in range(radix)]
     ```
 
+    更优的实现方式
+    
+    1. 多关键字排序，按个位十位百位依次排序
+    2. 分配一个0到9的桶count数组，从个位排起，对个位取余，按0到9放进对应编号的桶里；
+    3. 使用计数数组，从 0-9 记录累计当前桶的大小
+    4. 对桶的序号进行累加运算，得到桶里最后一个值的下标，然后`从后往前`遍历原数组arr，把arr[n]赋值给暂存数组
+        
+    
+    ```python
+    class Solution:
+        # 基数排序
+        def sortArray(self, nums: List[int]) -> List[int]:
+            n = len(nums)
+            item = 0
+            for i in range(n):
+                nums[i] += 50000 # 将负数转换为正数
+                item = max(item, nums[i])
+    
+            res = nums.copy() # 主要是记录从个位，十位，百位的变化过程，减少运算
+            while item:
+                count = [0]*10
+                for i in range(n): 
+                    count[res[i] % 10] += 1
+                count = list(accumulate(count)) # 桶的累计大小  
+                
+                tmp, res2 = [0]*n, [0]*n
+                for i in range(n-1, -1, -1): # 倒序很关键
+                    count[res[i] % 10] -= 1
+                    idx = count[res[i] % 10]
+                    tmp[idx] = nums[i]
+                    res2[idx] = res[i] // 10
+    
+                item //= 10
+                nums, res = tmp, res2
+    
+            return [i-50000 for i in nums]
+    ```
+    
     
 
 ### 桶排序 / 计数排序
 
 1. 桶排序也是一种不是基于比较的算法，时间复杂度为 0(N)，重点是需要设置合理的桶大小
-
 2. 计数排序，是桶大小为1的时候的特殊桶排序
+
+
+
+### 快速排序
+
+```python
+class Solution:
+    # 快排 左闭右闭区间
+    def sortArray(self, nums: List[int]) -> List[int]:
+        random.shuffle(nums) # 必须的操作
+        n = len(nums)
+        def quick(left, right):
+            if left >= right: return 
+            l, r, target = left+1, right, nums[left]
+            while l <= r:
+                while l <= r and nums[l] < target: l += 1
+                while l <= r and nums[r] > target: r -= 1
+                if l > r: break
+                nums[l], nums[r] = nums[r], nums[l]
+                l, r = l + 1, r - 1
+			# 与 r 进行交换是因为 r 最小的时候为 left 即不会越界
+            nums[left], nums[r] = nums[r], target
+            quick(left, r-1) # 确定了 nums[left] 的位置在 r 处
+            quick(l, right)
+        
+        quick(0, n-1)
+        return nums
+
+```
+
+### 归并排序
+
+归并排序 实质是 `后序遍历` 的过程
+
+```python
+class Solution:
+    # 归并排序
+    def sortArray(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+
+        tmp = nums.copy() # 暂存数组
+        def merge_sort(left, right): # 闭区间
+            if left >= right: return 
+            mid = (left + right) >> 1
+            merge_sort(left, mid)
+            merge_sort(mid+1, right)
+            
+            p1, p2 = left, mid + 1
+            cur = left
+            while p1 <= mid and p2 <= right:
+                if tmp[p1] <= tmp[p2]:
+                    nums[cur] = tmp[p1]
+                    p1 += 1
+                else:
+                    nums[cur] = tmp[p2]
+                    p2 += 1
+                cur += 1
+            
+            if p1 <= mid: nums[cur: cur+mid-p1+1] = tmp[p1: mid+1]
+            elif p2 <= right: nums[cur: cur+right-p2+1] = tmp[p2: right+1]
+            # 同步一下
+            tmp[left: right+1] = nums[left: right+1]
+
+        merge_sort(0, n-1)
+        return nums
+```
+
+
 
 ## 二分查找
 
@@ -765,6 +872,8 @@ eg: [378. 有序矩阵中第 K 小的元素](https://leetcode-cn.com/problems/kt
 1. 主要题型
     1. 表达式的优先生成问题
     2. 逆序对问题
+    3. 实质是后序遍历算法
+    4. 构造题：[932. 漂亮数组 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/beautiful-array/)
 
 ## 滑动窗口
 
@@ -1558,3 +1667,10 @@ Fisher-Yates 洗牌算法跟暴力算法很像。在每次迭代中，生成一�
 ### collections库
 
 1. OrderedDIct：哈希表 + 双向链表的结构内部实现，添加的key是按添加顺序排列的，有 move_to_end 方法
+
+### itertools库
+
+1.  itertools.permutations 排列函数
+2. itertools.combinations 组合函数（无放回抽样）
+3. itertools. combinations_with_replacement 有返回抽样
+
