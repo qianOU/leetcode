@@ -13,7 +13,7 @@ class Solution:
                 item, res = divmod(i, arr[r])
                 if res == 0 and item in map_:
                     l = map_[item]
-                    dp[idx] = (dp[idx] + (dp[l] * dp[r])) % base
+                    dp[idx] = (dp[idx] + dp[l] * dp[r]) % base
                 
         return sum(dp) % base
 
